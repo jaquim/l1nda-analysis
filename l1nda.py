@@ -21,7 +21,6 @@ data_last_planned.to_csv('last_planned_event_version.csv', sep=',')
 print(data_last_planned.head())
 
 
-
 # read in data set from the features file.
 def read_data_linear_reg(file_name):
     # read in data
