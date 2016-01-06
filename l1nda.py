@@ -1,20 +1,31 @@
 #!/usr/bin/python
 
+# Jaquim Cadogan
+
 from __future__ import division
 from progress.bar import Bar
 from scipy.stats import pearsonr
 import numpy as np
-import pandas
+import pandas as pd
 import warnings
+
 
 np.set_printoptions(threshold=np.nan)
 warnings.filterwarnings("ignore")
+
+file_name = 'l1nda_event_version.csv'
+data = pd.read_csv(file_name)
+
+data_last_planned = data[data['is_last_planned'] == 't']
+data_last_planned.to_csv('last_planned_event_version.csv', sep=',')
+print(data_last_planned.head())
+
 
 
 # read in data set from the features file.
 def read_data_linear_reg(file_name):
     # read in data
-    data = pandas.read_csv(file_name, sep=';')  # read in csv file as panda object
+    data = pd.read_csv(file_name, sep=';')  # read in csv file as panda object
     # delete first column, as that is non-contributal to the data
     # data.drop(data.columns[[0]], axis=1, inplace=True)
     # normalize data
