@@ -7,3 +7,4 @@ to calculate multivarite linear regression upon
 
 
 For dependencies use: pip install -r requirements.txt
+
