@@ -3,7 +3,6 @@
 # Jaquim Cadogan
 
 from __future__ import division
-from progress.bar import Bar
 from scipy.stats import pearsonr
 import numpy as np
 import pandas as pd
