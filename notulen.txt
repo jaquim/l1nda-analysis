@@ -6,6 +6,18 @@
 - en voor het mappen met de weerdata is het fijn onnodig berekeningen van de iteraties uit te voeren voor nietszeggende data.
 
 
+---------------------------------------------------------
+
+Vragen:
+
+Waarom zijn sommige user_id's leeg
+
+
+
+
+
+---------------------------------------------------------
+
 
 Aanpak (stappenplan):
 	Doel:
@@ -42,17 +54,22 @@ Aanpak (stappenplan):
 		6. Regressie uitvoeren
 
 
+---------------------------------------------------------
+
 Logboek:
 
 Dinsdag 5-01-2016
 
 	Start project, Hoorcollege over het project van 9-11, daarna bespreking met Wouter Suren van L1nda over de opdracht.
 	De bedoeling is om een programma te schrijven dat door de aangeleverde data heengaat en opzoek gaat naar de meest predictive features die voorspellen hoeveel uren er ingeroosterd moeten worden.
-	De data is nog niet aangeleverd dus we hebben nog niet concreet iets kunnen doen, gebrainstormd over hoe we dit aan zouden pakken. Het liefst met multivariate lineaire regressie kijken of we modellen kunnen trainen die voorspelen hoeveel uren er ingeplant worden op basis van bepaalde features. Ook willen we kijken naar unsupervised learning om te kijken of we wat clusters kunnen maken voor het uitbreiden van de features.
+	De data is nog niet aangeleverd dus we hebben nog niet concreet iets kunnen doen, gebrainstormd over hoe we dit aan zouden pakken. Het liefst met multivariate lineaire regressie kijken of we modellen kunnen trainen die voorspelen hoeveel uren er ingeplant worden op basis van bepaalde features. Ook willen we kijken naar unsupervised learning om te kijken of we wat clusters kunnen maken voor het uitbreiden van de features. We willen als features het weer in ieder geval gebruiken, dit staat echter niet in de aangeleverde data dus die moeten we zelf gaan zien te maken.
 
 
 Woensdag 6-01-2016
-	change
+
+	We hebben de data gekregen vandaag, de twee belangrijkste dingen die we moeten doen zijn het werkend krijgen van de data, dit is geschreven als psql file en dit kunnen we niet openen. Na veel proberen hebben we uiteindelijk de data werkend gekregen en kunnen we dit wegschrijven. Echter kunnen we nog niet goed de data uit het bestand halen die we nodig hebben. We weten niet precies hoe we de data per bedrijf kunnen krijgen, dus daar moeten we nog even naar kijken. Ook het aantal gewerkte uren konden we niet tevoorschijn krijgen omdat er in de uitleg per email stond dat dit zo was als 'is_deleted' == false OF 'is_deleted' == true AND forward_id == forward_id. Dit kan niet want dan heb je alle data. Hier hebben we contact voor gezocht maar nog geen antwoord op gekregen. 
+Wel hebben we de geplande uren kunnen opvragen.
 
 Donderdag 7-01-2016
 
+	Vandaag hebben we werkend gekregen dat we per bedrijf data kunne opvragen, ook de gewerkte uren zijn goed nu op te vragen, dit bleek te zijn dat het forward_id == id. Ook de weercijfers zijn goed dus die kunnen we nu toevoegen aan de data. Hierna zijn we waarschijnlijk bijna klaar met het preprocessen van de data en kunnen we aan de slag met het verwerken en de leeralgoritmes.
