@@ -4,3 +4,4 @@ datadump
 *.zip
 *.csv
 venv
+backup
