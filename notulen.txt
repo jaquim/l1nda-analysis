@@ -10,7 +10,7 @@
 
 Vragen:
 
-Waarom zijn sommige user_id's leeg
+Waarom zijn sommige user_id's leeg?
 
 
 
