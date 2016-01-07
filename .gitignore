@@ -2,3 +2,4 @@ datadump
 *.psql
 *event*
 *.zip
+*.csv
