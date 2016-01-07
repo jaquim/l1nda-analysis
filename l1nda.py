@@ -16,7 +16,7 @@ pd.options.display.max_colwidth = 100
 
 
 def fetch_data(file_name='COMPANY_37_BRANCH_141'):
-  
+
     input_path = './datadump/' + file_name + '.csv'
 
     output_worked_path = './datadump/' + file_name + '_WORKED_OUTPUT.csv'
@@ -47,6 +47,7 @@ def transform_data(data_frame, output_path):
     print(data_frame.head())
     return data_frame
 
+fetch_data()
 
 # read in data set from the features file.
 def read_data_linear_reg(file_name):

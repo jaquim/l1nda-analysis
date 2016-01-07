@@ -2,6 +2,8 @@
 - oplossing database juiste info opvragen (where date < '20160101')
 - keuze gemaakt om per layer een voorspellend model te maken
 - weercijfer formule gemaakt
+- data tot voor 2010 eruit halen aangezien l1nda voor 2009 nog niet bestaat, waarschijnlijk was deze data resultaat testjes
+- en voor het mappen met de weerdata is het fijn onnodig berekeningen van de iteraties uit te voeren voor nietszeggende data.
 
 
 
