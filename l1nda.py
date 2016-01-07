@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 pd.options.display.max_colwidth = 100
 
 
-def fetch_data(file_name='COMPANY_37_BRANCH_141'):
+def fetch_data(file_name='COMPANY_37_BRANCH_141', weather_file='datadump_weercijfer.csv'):
 
     input_path = './datadump/' + file_name + '.csv'
 
@@ -28,13 +28,13 @@ def fetch_data(file_name='COMPANY_37_BRANCH_141'):
     data_worked = data[(data['is_deleted'] == 'f') | (data['is_deleted'] == 't') \
                 & (data['forward_id'] == data['event_version_id'])]
 
-    data_worked = transform_data(data_worked, output_worked_path)
-    data_planned = transform_data(data_planned, output_planned_path)
+    data_worked = transform_data(data_worked, output_worked_path, weather_file)
+    data_planned = transform_data(data_planned, output_planned_path, weather_file)
 
     print(data_worked)
 
 
-def transform_data(data_frame, output_path):
+def transform_data(data_frame, output_path, weather_file):
 
     start = pd.to_datetime(data_frame['start'])
     end = pd.to_datetime(data_frame['end'])
@@ -44,20 +44,25 @@ def transform_data(data_frame, output_path):
     data_frame['end'] = end.dt.strftime('%H:%M:%S')
     data_frame['hours'] = (end-start)
 
-    data_frame = data_frame.reset_index()
+    return fetch_layers(data_frame, weather_file)
 
-    data_frame = add_weather(data_frame, 'datadump_weercijfer.csv')
-    data_frame.to_csv(output_path, sep=',')
 
-    return data_frame
+def fetch_layers(data_frame, weather_file):
+    layer_dict = dict()
+    grouped = data_frame.groupby('layer_name')
+    for name, group in grouped:
+        layer = group.groupby('date')['hours'].sum().reset_index()
+        layer = add_weather(layer, weather_file)
+        for index, entry in enumerate(layer['hours']):
+            layer['hours'] = entry.total_seconds()//3600
+        layer_dict[name] = layer
+    return layer_dict
 
 
 def add_weather(data_frame, weather_data_file):
 
     weather_frame = pd.read_csv('./datadump/' + weather_data_file)
     weather_frame.drop('0', axis=1, inplace=True)
-
-    print(weather_frame.describe())
 
     weather_grades = list()
     for index, weather_date in enumerate(weather_frame['datum']):
