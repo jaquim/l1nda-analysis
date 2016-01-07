@@ -31,6 +31,8 @@ def fetch_data(file_name='COMPANY_37_BRANCH_141'):
     data_worked = transform_data(data_worked, output_worked_path)
     data_planned = transform_data(data_planned, output_planned_path)
 
+    print(data_worked)
+
 
 def transform_data(data_frame, output_path):
 
@@ -42,12 +44,33 @@ def transform_data(data_frame, output_path):
     data_frame['end'] = end.dt.strftime('%H:%M:%S')
     data_frame['hours'] = (end-start)
 
+    data_frame = data_frame.reset_index()
+
+    data_frame = add_weather(data_frame, 'datadump_weercijfer.csv')
     data_frame.to_csv(output_path, sep=',')
 
-    print(data_frame.head())
+    return data_frame
+
+
+def add_weather(data_frame, weather_data_file):
+
+    weather_frame = pd.read_csv('./datadump/' + weather_data_file)
+    weather_frame.drop('0', axis=1, inplace=True)
+
+    print(weather_frame.describe())
+
+    weather_grades = list()
+    for index, weather_date in enumerate(weather_frame['datum']):
+        for data_date in data_frame['date']:
+            if weather_date == data_date:
+                weather_grades.append(weather_frame['cijfer'][index])
+
+    data_frame['weather_grade'] = weather_grades
+
     return data_frame
 
 fetch_data()
+
 
 # read in data set from the features file.
 def read_data_linear_reg(file_name):
