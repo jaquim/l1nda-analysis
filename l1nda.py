@@ -14,22 +14,23 @@ np.set_printoptions(threshold=np.nan)
 warnings.filterwarnings("ignore")
 
 pd.options.display.max_colwidth = 100
-file_name = './datadump/l1nda_event_version.csv'
 
-data = pd.read_csv(file_name)
-data.drop('pause', axis=1, inplace=True)
+file_name = 'COMPANY_37_BRANCH_141'
+input_path = './datadump/' + file_name + '.csv'
+output_path = './datadump/' + file_name + '_OUTPUT.csv'
 
+data = pd.read_csv(input_path)
 
 data_last_planned = data[data['is_last_planned'] == 't']
 
 start = pd.to_datetime(data_last_planned['start'])
 end = pd.to_datetime(data_last_planned['end'])
 
-data_last_planned.insert(6, 'date', start.dt.strftime('%Y-%m-%d'))
+data_last_planned['date'] = start.dt.strftime('%Y-%m-%d')
 data_last_planned['start'] = start.dt.strftime('%H:%M:%S')
 data_last_planned['end'] = end.dt.strftime('%H:%M:%S')
-data_last_planned.insert(9, 'hours', (end-start))
-# data_last_planned.to_csv('./datadump/last_planned_event_version.csv', sep=',')
+data_last_planned['hours'] = (end-start)
+data_last_planned.to_csv(output_path, sep=',')
 print(data_last_planned.head())
 
 
