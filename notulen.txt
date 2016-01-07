@@ -1,0 +1,41 @@
+- is_deleted = false klopt in toekomst, maar nog niet daadwerkelijk gewerkt
+- oplossing database juiste info opvragen (where date < '20160101')
+- keuze gemaakt om per layer een voorspellend model te maken
+- weercijfer formule gemaakt
+
+
+
+Aanpak (stappenplan):
+	Doel:
+		Aan de hand van een samen te stellen combinatie van features, multivariate lineaire regressie uitvoeren, om vervolgens een model te genereren dat zo accuraat mogelijk voorspelt wat het gewerkt aantal uren op een dag zal zijn.
+		(Dit kan dan dan worden vergelijken met het daadwerkelijk aantal gewerkte uren en het geplande aantal uren van een professioneel rooster maker.)
+
+		**** Doel: welke features dragen bij aan de verhoging van de accuracy?
+		**** is het dan vervanging van roosterplanner?
+		**** Eigenlijk eerst kijken/spelen naar/met de most predictive values en kijken hoe accuraat het model is, en dan kijken of het 		 toevoegen van zelf bedachte features die accuracy verhoogt?
+		**** Polynomiale multivariate lineare regressie?
+		**** Een systeem dat op basis van univariaat (predictive) uren berekent, en suggestie doet voor meer of minder (kan ook met naive 		 bayes, of combinatie)?		
+		**** API maken op een server?
+
+		**** Uren berekenen in totaal per dag? per functie per dag? per functie per locatie in totaal per dag?
+
+		**** Hoe krijgen we het aantal daadwerkelijk gewerkte uren?
+		**** Hoe sorteren we het geplande/gewerkte uren per locatie?
+		**** beetje marketing, kunnen we de magic ‘drukte feature’ bedenken?
+
+		1. Zelf (indicatieve) features bedenken, mogelijke features:
+			- Gemiddeld aantal uren op de dag van de week
+		    - Zelfde dag/week vorig jaar
+			- Weercijfer die dag
+			- Standaard fout in de planning
+			- Feestdag/speciale events
+			- Type contract
+			- Openingstijden
+			- Drukte per dagdeel
+			- (Omzet/gewerkt aantal uren?)
+		2. Correlatie berekenen om te bekijken welke features de meest predictive value hebben uit de dataset, om die vervolgens ook mee te nemen in 	de lineaire regressie.
+		3. (Kijken of de zelf bedachte features een hoge predictive value/correlatie hebben?)
+		4. Zelf bedachte features en most predictive values samenvoegen
+		5. (Ergens clustering gebruiken om te kijken wat voor features er mogelijk verscholen zitten in de data)
+		6. Regressie uitvoeren
+
