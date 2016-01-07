@@ -8,13 +8,15 @@ Created on Wed Jan  6 12:06:14 2016
 import pandas as pandas
 import numpy as np
 
+
 def read():
     knmi2 = pandas.read_csv('Bewerken2.csv', sep=',')
     knmi2['YYYYMMDD'] = pandas.to_datetime(knmi2['YYYYMMDD'], format='%Y%m%d')
     knmi2['YYYYMMDD'] = knmi2['YYYYMMDD'].dt.strftime('%Y-%m-%d')    
     knmi2 = np.matrix(knmi2)
     return knmi2
-    
+
+
 def rain(regen):
     regen = regen*6
     if regen < 10:
@@ -28,6 +30,7 @@ def rain(regen):
     if regen >= 500:
         return 4
 
+
 def dekkingsgraad(bewolking):
     if bewolking < 2:
         return 0
@@ -37,6 +40,7 @@ def dekkingsgraad(bewolking):
         return 2
     if bewolking >= 7:
         return 3
+
 
 def beaufort(wind):
     if wind < 34:
@@ -48,13 +52,15 @@ def beaufort(wind):
     if wind >= 108:
         return 3
 
+
 def weercijfer(wind, regen, bewolking):
     grade = 10
     grade = grade - rain(regen)
     grade = grade - dekkingsgraad(bewolking)
     grade = grade - beaufort(wind)
-    
+
     return grade
+
 
 def cijfer(matrix):
     cijferList = [['datum', 'cijfer']]
@@ -69,11 +75,9 @@ def cijfer(matrix):
     return cijferList
 
 if __name__ == "__main__":
-    
+
     knmi = read()
     iets = np.ravel(knmi[-1])
     cijferList = cijfer(knmi)
     df = pandas.DataFrame(cijferList)
-    df.to_csv('datadump.csv', sep = ',')
-#    print(np.shape(iets))
-#    print(np.ravel(iets))
+    df.to_csv('datadump.csv', sep=',')
