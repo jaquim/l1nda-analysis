@@ -134,10 +134,3 @@ def read_data_linear_reg(file_name):
     Y = np.array(Y)
 
     return X, Y, data_size, theta_vector
-
-
-def compute_correlation(X, Y):
-    correlation_vector = list()
-    for column in X.T:
-        correlation_vector.append(pearsonr(np.ravel(column.tolist()), np.ravel(Y.tolist()))[0])
-    return correlation_vector
