@@ -5,3 +5,4 @@ datadump
 *.csv
 venv
 backup
+*.pyc
