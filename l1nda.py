@@ -94,10 +94,8 @@ def add_festivities(data_frame, festivity_file):
     festivities_frame = pd.read_csv('./datadump/' + festivity_file)
     festivities_binary = list()
 
-    print(festivities_frame['datum'])
     for index, festivity_date in enumerate(festivities_frame['datum']):
         for data_date in data_frame['date']:
-            print(festivity_date, data_date)
             if festivity_date == data_date:
                 festivities_binary.append(1)
             else:
@@ -127,7 +125,6 @@ def return_data_object(data_dict):
         X = np.matrix(X)
         Y = np.array(Y)
 
-        print(X, Y)
         data_dict[layer_name] = [X, Y]
 
     return data_dict
