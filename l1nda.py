@@ -3,13 +3,12 @@
 # Jaquim Cadogan
 
 from __future__ import division
-from scipy.stats import pearsonr
 import numpy as np
 import pandas as pd
 import warnings
 import os
 import shutil
-from datetime import date
+from datetime import date, timedelta
 import datetime
 
 np.set_printoptions(threshold=np.nan)
@@ -66,10 +65,10 @@ def fetch_layers(data_frame, weather_file, festivity_file, output_path, file_nam
 
         layer = group.groupby('date')['hours'].sum().reset_index()
 
-        layer = add_mean_weekday_lastyear(layer)
+        # layer = add_mean_weekday_lastyear(layer)
         layer = add_weather(layer, weather_file)
         # layer = add_festivities(layer, festivity_file)
-        # layer = add_last_week(layer)
+        layer = add_last_week(layer)
         layer = add_hours(layer)
 
         layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',')
@@ -102,22 +101,29 @@ def add_weather(data_frame, weather_data_file):
     return data_frame
 
 
+# Adds a column with the worked hours of the same day last week per entry.
 def add_last_week(layer):
     last_week_hours = list()
-    for index, today in enumerate(layer['date']):
-
+    # for every entry (day)
+    for today in layer['date']:
+        # changes the string to a datetime object
         today = datetime.datetime.strptime(today, "%Y-%m-%d").date()
-
-        offset = datetime.timedelta(days=7)
-
-        last_weekday = today - offset
-        last_weekday = last_weekday.strftime('%Y-%m-%d')
-
-        hours = layer['date'] == last_weekday
-        print(hours)
+        offset = timedelta(days=7)
+        offset2 = timedelta(days=14)
+        # returns the worked hours of the same day last week
+        last_weekday = (today - offset).strftime('%Y-%m-%d')
+        hours = layer[layer['date'] == last_weekday]['hours']
+        # If there was no entry last week, check 2 weeks ago
+        if hours.tolist() == []:
+            last_weekday = today - offset2
+            last_weekday = last_weekday.strftime('%Y-%m-%d')
+            hours = layer[layer['date'] == last_weekday]['hours']
+        # Converts the datetime to ints
         hours = (hours.dt.total_seconds()/3600)
-        last_week_hours.append(hours)
-        break
+        hours = hours.tolist()
+        if hours == []:
+            hours.append(0)
+        last_week_hours.append(round(hours[0], 2))
 
     layer['lastweek_worked_hours'] = last_week_hours
 
@@ -127,7 +133,9 @@ def add_last_week(layer):
 def add_mean_weekday_lastyear(layer):
     layer_DateTimeIndex = pd.DatetimeIndex(layer['date'])
     layer['weekday'] = layer_DateTimeIndex.weekday
-    layer = layer.groupby(['weekday']).apply(custom_mean)
+    layer_temp = layer.groupby(['weekday']).apply(custom_mean)
+    print(layer_temp)
+    layer = layer_temp
     layer = layer.drop('weekday', axis=1)
 
     return layer
@@ -201,8 +209,8 @@ def return_data_object(data_dict):
         X = np.matrix(X)
         Y = np.array(Y)
 
-        data_dict[layer_name]['data'], data_dict[layer_name]['y_vector'] = X, Y
-
+        data_dict[layer_name]['data'] = X
+        data_dict[layer_name]['y_vector'] = Y
 
     return data_dict
 
