@@ -9,6 +9,8 @@ import pandas as pd
 import warnings
 import os
 import shutil
+from datetime import date
+import datetime
 
 np.set_printoptions(threshold=np.nan)
 warnings.filterwarnings("ignore")
@@ -61,13 +63,18 @@ def fetch_layers(data_frame, weather_file, festivity_file, output_path, file_nam
     layer_dict = dict()
     grouped = data_frame.groupby('layer_name')
     for name, group in grouped:
+
         layer = group.groupby('date')['hours'].sum().reset_index()
+
+        layer = add_mean_weekday_lastyear(layer)
         layer = add_weather(layer, weather_file)
         # layer = add_festivities(layer, festivity_file)
+
         layer_hours = list()
         for index, entry in enumerate(layer['hours']):
             layer_hours.append(entry.total_seconds()/3600)
         layer['hours'] = layer_hours
+
         layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',')
         layer_dict[name] = layer
     return layer_dict
@@ -84,9 +91,67 @@ def add_weather(data_frame, weather_data_file):
             if weather_date == data_date:
                 weather_grades.append(weather_frame['cijfer'][index])
 
-    data_frame.insert(1, 'weather_grade', weather_grades)
+    data_frame['weather_grades'] = weather_grades
 
     return data_frame
+
+
+def add_last_week(layer):
+    last_week_hours = list()
+    for elem in layer.iterrows():
+        today = elem[1]['date']
+        today = datetime.datetime.strptime(today, "%Y-%m-%d").date()
+        today = today.strftime('%Y,%m,%d')
+        today = datetime.datetime.strptime(today, "%Y,%m,%d").date()
+        offset = datetime.timedelta(days=7)
+        last_weekday = today - offset 
+        last_weekday = last_weekday.strftime('%Y-%m-%d')        
+        hours = layer[layer['date']==last_weekday]['hours']
+        hours = (hours.dt.total_seconds()/3600)
+        print(hours)
+        print(type(hours))
+        last_week_hours.append(hours)
+
+
+def add_mean_weekday_lastyear(layer):
+    layer_DateTimeIndex = pd.DatetimeIndex(layer['date'])
+    layer['weekday'] = layer_DateTimeIndex.weekday
+    layer = layer.groupby(['weekday']).apply(custom_mean)
+    layer = layer.drop('weekday', axis=1)
+
+    return layer
+
+
+def custom_mean(grp):
+    # Retrieve the mean worked time on day of the week last year
+    totalhours = datetime.timedelta(0)
+    counter = 0
+    for row in grp.iterrows():
+        datum = row[1]['date']
+        datum = datetime.datetime.strptime(datum, "%Y-%m-%d")
+        jaar = datum.year
+        if jaar == date.today().year-1:
+            totalhours = totalhours + row[1]['hours']
+            counter += 1
+
+    # If last year is not available:
+    jaarcounter = 2
+    while counter == 0:
+        for row in grp.iterrows():
+            datum = row[1]['date']
+            datum = datetime.datetime.strptime(datum, "%Y-%m-%d")
+            jaar = datum.year
+
+            if jaar == date.today().year-jaarcounter:
+                totalhours = totalhours + row[1]['hours']
+                counter += 1
+        jaarcounter += 1
+
+    mean = totalhours/counter
+
+    grp['mean_weekday_lastyear'] = mean.total_seconds()/3600
+
+    return grp
 
 
 def add_festivities(data_frame, festivity_file):
@@ -129,3 +194,5 @@ def return_data_object(data_dict):
 
 
     return data_dict
+
+fetch_data()
