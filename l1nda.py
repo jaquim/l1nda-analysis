@@ -127,7 +127,6 @@ def return_data_object(data_dict):
         X = np.matrix(X)
         Y = np.array(Y)
 
-        print(X, Y)
-        data_dict[layer_name] = [X, Y]
+        data_dict[layer_name]['data'], data_dict[layer_name]['y_vector'] = X, Y
 
     return data_dict
