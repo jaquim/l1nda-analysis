@@ -62,10 +62,10 @@ def fetch_layers(data_frame, weather_file, festivity_file, output_path, file_nam
         layer = group.groupby('date')['hours'].sum().reset_index()
         layer = add_weather(layer, weather_file)
         # layer = add_festivities(layer, festivity_file)
-        print(layer['hours'])
+        layer_hours = list()
         for index, entry in enumerate(layer['hours']):
-            print(entry.total_seconds()//3600)
-            layer['hours'][index] = entry.total_seconds()
+            layer_hours.append(entry.total_seconds()/3600)
+        layer['hours'] = layer_hours
         layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',')
         layer_dict[name] = layer
     return layer_dict
