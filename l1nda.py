@@ -69,15 +69,21 @@ def fetch_layers(data_frame, weather_file, festivity_file, output_path, file_nam
         layer = add_mean_weekday_lastyear(layer)
         layer = add_weather(layer, weather_file)
         # layer = add_festivities(layer, festivity_file)
-
-        layer_hours = list()
-        for index, entry in enumerate(layer['hours']):
-            layer_hours.append(entry.total_seconds()/3600)
-        layer['hours'] = layer_hours
+        # layer = add_last_week(layer)
+        layer = add_hours(layer)
 
         layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',')
         layer_dict[name] = layer
     return layer_dict
+
+
+def add_hours(layer):
+    layer_hours = list()
+    for index, entry in enumerate(layer['hours']):
+        layer_hours.append(entry.total_seconds()/3600)
+    layer['hours'] = layer_hours
+
+    return layer
 
 
 def add_weather(data_frame, weather_data_file):
@@ -98,19 +104,24 @@ def add_weather(data_frame, weather_data_file):
 
 def add_last_week(layer):
     last_week_hours = list()
-    for elem in layer.iterrows():
-        today = elem[1]['date']
+    for index, today in enumerate(layer['date']):
+
         today = datetime.datetime.strptime(today, "%Y-%m-%d").date()
-        today = today.strftime('%Y,%m,%d')
-        today = datetime.datetime.strptime(today, "%Y,%m,%d").date()
+
         offset = datetime.timedelta(days=7)
-        last_weekday = today - offset 
-        last_weekday = last_weekday.strftime('%Y-%m-%d')        
-        hours = layer[layer['date']==last_weekday]['hours']
-        hours = (hours.dt.total_seconds()/3600)
+
+        last_weekday = today - offset
+        last_weekday = last_weekday.strftime('%Y-%m-%d')
+
+        hours = layer['date'] == last_weekday
         print(hours)
-        print(type(hours))
+        hours = (hours.dt.total_seconds()/3600)
         last_week_hours.append(hours)
+        break
+
+    layer['lastweek_worked_hours'] = last_week_hours
+
+    return layer
 
 
 def add_mean_weekday_lastyear(layer):
