@@ -37,6 +37,8 @@ def fetch_data(file_name='COMPANY_37_BRANCH_141',
     data_worked = transform_data(data_worked, 'WORKED', weather_file, festivity_file, file_name)
     data_planned = transform_data(data_planned, 'PLANNED', weather_file, festivity_file, file_name)
 
+    return return_data_object(data_worked), return_data_object(data_planned)
+
 
 def transform_data(data_frame, output_path, weather_file, festivity_file, file_name):
 
@@ -82,7 +84,7 @@ def add_weather(data_frame, weather_data_file):
             if weather_date == data_date:
                 weather_grades.append(weather_frame['cijfer'][index])
 
-    data_frame['weather_grade'] = weather_grades
+    data_frame.insert(1, 'weather_grade', weather_grades)
 
     return data_frame
 
@@ -104,40 +106,28 @@ def add_festivities(data_frame, festivity_file):
 
     return data_frame
 
-fetch_data()
-
 
 # read in data set from the features file.
-def read_data_linear_reg(file_name):
-    # read in data
-    data = pd.read_csv(file_name, sep=';')  # read in csv file as panda object
-    # delete first column, as that is non-contributal to the data
-    # data.drop(data.columns[[0]], axis=1, inplace=True)
-    # normalize data
-    # data = (data - data.mean()) / (data.max() - data.min())
-    data_size = len(data)
+def return_data_object(data_dict):
+    # delete first column, as that is non-contributal to the data_dict
+    # data_dict.drop(data_dict.columns[[0]], axis=1, inplace=True)
+    # normalize data_dict
+    # data_dict = (data_dict - data_dict.mean()) / (data_dict.max() - data_dict.min())
+    # data_dict_size = len(data_dict)
 
-    # initialize X matrix, and Y vector
-    X, Y = list(), list()
+    for layer_name, data_frame in data_dict.items():
+        # initialize X matrix, and Y vector
+        X, Y = list(), list()
+        for index, row in data_frame.iterrows():
+                    # x vector in x matrix  are pixel values to classifcate labels upon
+                    X.append(np.array(row[1:-1]))
+                    # y factor (classification labels)
+                    Y.append(np.array([row[-1]]))
 
-    theta_value = 1
-    theta_size = len(data.columns)
-    theta_vector = np.array([[theta_value] for value in range(theta_size)])
+        X = np.matrix(X)
+        Y = np.array(Y)
 
-    for index, row in data.iterrows():
-                # x vector in x matrix  are pixel values to classifcate labels upon
-                X.append(np.array(1, (row[:-1])))
-                # y factor (classification labels)
-                Y.append(np.array([row[-1]]))
+        print(X, Y)
+        data_dict[layer_name] = [X, Y]
 
-    X = np.matrix(X)
-    Y = np.array(Y)
-
-    return X, Y, data_size, theta_vector
-
-
-def compute_correlation(X, Y):
-    correlation_vector = list()
-    for column in X.T:
-        correlation_vector.append(pearsonr(np.ravel(column.tolist()), np.ravel(Y.tolist()))[0])
-    return correlation_vector
+    return data_dict
