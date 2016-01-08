@@ -1,15 +1,22 @@
-import numpy as numpy
+import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+#import statsmodels.api as sm
 import l1nda
+from scipy.stats import pearsonr
 
 
+
+def read_data():
+	data = pd.read_csv('./datadump/COMPANY_37_BRANCH_141/WORKED/COMPANY_37_BRANCH_141_WORKED_layer432.csv')
+	hours = np.array(data['hours'].tolist())
+	weather_grade = np.array(data['weather_grade'].tolist())
+	return hours, weather_grade
 
 def compute_correlation(X, Y):
     correlation_vector = list()
-    for column in X.T:
-        correlation_vector.append(pearsonr(np.ravel(column.tolist()), np.ravel(Y.tolist()))[0])
+    correlation_vector.append(pearsonr(np.ravel(X.tolist()), np.ravel(Y.tolist()))[0])
     return correlation_vector
 
 
-print compute_correlation(weather_grade, worked_hours)
+hours, weather_grade = read_data()
+print compute_correlation(hours, weather_grade)
