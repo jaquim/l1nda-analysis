@@ -19,24 +19,22 @@ _author_ = "Simon Hoekman, Wout Kooijman, Max Mijnheer, Jaquim Cadogan"
         ```
     Ouput to dict (.csv) in the following format:
 
-    {COMPANY_[id]_BRANCH_[id]: {
-        WORKED: {
-                layer[id]:{
-                    'data': numpy.matrix
-                    'y_vector': nump.ndarray
-                    },
-                ...
-                ...
-            },
-        PLANNED: {
-                layer[id]:{
-                    'data': numpy.matrix
-                    'y_vector': nump.ndarray
-                    },
-                ...
-                ...
-            },
-        }
+    {WORKED: {
+            layer[id]:{
+                'data': numpy.matrix
+                'y_vector': nump.ndarray
+                },
+            ...
+            ...
+        },
+    PLANNED: {
+            layer[id]:{
+                'data': numpy.matrix
+                'y_vector': nump.ndarray
+                },
+            ...
+            ...
+        },
     }
 """
 
@@ -116,8 +114,8 @@ def fetch_layers(data_frame, output_path):
         layer = group.groupby('date')['hours'].sum().reset_index()
 
         # layer = add_festivities(layer)
-        # layer = add_mean_weekday_lastyear(layer)
-        # layer = add_weather(layer)
+        layer = add_weather(layer)
+        layer = add_mean_weekday_lastyear(layer)
         layer = add_last_week(layer)
         layer = add_hours(layer)
 
@@ -187,7 +185,7 @@ def add_last_week(layer):
 def add_mean_weekday_lastyear(layer):
     layer_DateTimeIndex = pd.DatetimeIndex(layer['date'])
     layer['weekday'] = layer_DateTimeIndex.weekday
-    layer = layer.groupby('weekday').apply(custom_mean, axis=1)
+    layer = layer.groupby('weekday').apply(custom_mean)
     layer = layer.drop('weekday', axis=1)
 
     return layer
@@ -248,8 +246,8 @@ def return_data_object(data_dict):
     # normalize data_dict
     # data_dict = (data_dict - data_dict.mean()) / (data_dict.max() - data_dict.min())
     # data_dict_size = len(data_dict)
-
     for layer_name, data_frame in data_dict.items():
+        print('A')
         # initialize X matrix, and Y vector
         X, Y = list(), list()
         for index, row in data_frame.iterrows():
@@ -261,9 +259,6 @@ def return_data_object(data_dict):
         X = np.matrix(X)
         Y = np.array(Y)
 
-        data_dict[layer_name]['data'] = X
-        data_dict[layer_name]['y_vector'] = Y
+        data_dict[layer_name] = {'data': X, 'y_vector': Y}
 
     return data_dict
-
-fetch_data()
