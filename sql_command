@@ -7,6 +7,9 @@ COPY (select * from event_version) TO '~/Desktop/l1nda.csv' DELIMITER ',' CSV HE
 COPY (select dwh.domain.id as "domain", dwh.affiliate.id as "branch", dwh.layer.name as "layer_name", dwh.layer.type as "layer_type", dwh.event_version.start, dwh.event_version.end, dwh.event_version.is_last_planned as "is_last_planned", dwh.event_version.is_deleted as "is_deleted", dwh.event_version.forward_id as "forward_id", dwh.event_version.id as "event_version_id" from dwh.domain inner join dwh.affiliate on dwh.domain.id = dwh.affiliate.domain_id inner join dwh.layer on dwh.affiliate.id = dwh.layer.affiliate_id inner join dwh.event on dwh.layer.id = dwh.event.layer_id inner join dwh.event_version on dwh.event.id = dwh.event_version.event_id where dwh.domain.id = 37 and dwh.affiliate.id = 141 and dwh.layer.type = 'schedule' and dwh.event_version.start < '20160101' order by dwh.event_version.start, dwh.layer.name) TO '~/Desktop/COMPANY_37_BRANCH_141.csv' DELIMITER ',' CSV HEADER;
 
 
+
+dwh.domain.id = 37 and dwh.affiliate.id = 141 and 
+
 (
 select 
 		dwh.domain.id as "domain", 
@@ -30,9 +33,9 @@ inner join
 inner join
 		dwh.event_version on dwh.event.id = dwh.event_version.event_id
 where
-		dwh.domain.id = 37 and dwh.affiliate.id = 141 and dwh.layer.type = 'schedule' and dwh.event_version.start < '20160101'
+		dwh.layer.type = 'schedule' and dwh.event_version.start < '20160101'
 order by
-		dwh.event_version.start, dwh.layer.name
+		dwh.domain.id, dwh.affiliate.id, dwh.layer.name, dwh.event_version.start
 );
 
 
