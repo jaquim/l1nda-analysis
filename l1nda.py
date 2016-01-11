@@ -120,10 +120,10 @@ def fetch_layers(data_frame, output_path):
 
         layer = group.groupby('date')['hours'].sum().reset_index()
 
-        # layer = add_festivities(layer)
+        layer = add_festivities(layer)
         layer = add_weather(layer)
         layer = add_mean_weekday_lastyear(layer)
-        layer = add_last_week(layer)
+        layer = add_historical_data(layer)
         layer = add_hours(layer)
 
         layer = order_layer(layer)
@@ -174,9 +174,11 @@ def add_weather(data_frame):
     return data_frame
 
 
-# Adds a column with the worked hours of the same day last week per entry.
-def add_last_week(layer):
+# Adds a column with the worked hours of the same day last week and year per entry.
+def add_historical_data(layer):
     last_week_hours = list()
+    last_year_hours = list()
+
     # for every entry (day)
     for today in layer['date']:
         # changes the string to a datetime object
@@ -198,7 +200,32 @@ def add_last_week(layer):
             hours.append(0)
         last_week_hours.append(round(hours[0], 2))
 
+# ------------- Does the same for last year, same day of the week --------
+
+        # changes the string to a datetime object
+        day = today.weekday()
+        offset = timedelta(days=365)
+        offset2 = timedelta(days=372)
+        # returns the worked hours of the same day of the week last year
+        last_year = today-offset
+        last_year = last_year - timedelta(last_year.weekday() - day)
+        last_year = (today - offset).strftime('%Y-%m-%d')
+        hours = layer[layer['date'] == last_year]['hours']
+        # If there was no entry, check a week earlier
+        if hours.tolist() == []:
+            last_year = today-offset2
+            last_year = last_year - timedelta(last_year.weekday() - day)
+            last_year = (today - offset).strftime('%Y-%m-%d')
+            hours = layer[layer['date'] == last_year]['hours']
+        # Converts the datetime to ints
+        hours = (hours.dt.total_seconds()/3600)
+        hours = hours.tolist()
+        if hours == []:
+            hours.append(0)
+        last_year_hours.append(round(hours[0], 2))
+
     layer['lastweek_worked_hours'] = last_week_hours
+    layer['last_year_worked_hours'] = last_year_hours
 
     return layer
 
@@ -245,28 +272,28 @@ def custom_mean(grp):
 
 
 def add_festivities(data_frame):
-    # feestdagen per jaar opzoek! 2016 werkt niet, vanzelfsprekend ;)
     festivities_frame = pd.read_csv('./datadump/' + festivity_file)
-    festivities_binary = list()
 
-    for index, festivity_date in enumerate(festivities_frame['datum']):
-        for data_date in data_frame['date']:
-            if festivity_date == data_date:
-                festivities_binary.append(1)
-            else:
-                festivities_binary.append(0)
-    data_frame['festivities'] = festivities_binary
+    festivity_dates = pd.to_datetime(festivities_frame['datum'])
+    festivities_frame['datum'] = festivity_dates.dt.strftime('%m-%d')
+
+    dates = data_frame['date']
+    dates = pd.to_datetime(dates)
+    dates = dates.dt.strftime('%m-%d')
+
+    festivities_binary = [0 for x in range(len(dates))]
+    for index, data_date in enumerate(dates):
+        for festivity_date in festivities_frame['datum']:
+            if data_date == festivity_date:
+                festivities_binary[index] = 1
+
+    data_frame['festivity'] = festivities_binary
 
     return data_frame
 
 
 # read in data set from the features file.
 def return_data_object(data_dict):
-    # delete first column, as that is non-contributal to the data_dict
-    # data_dict.drop(data_dict.columns[[0]], axis=1, inplace=True)
-    # normalize data_dict
-    # data_dict = (data_dict - data_dict.mean()) / (data_dict.max() - data_dict.min())
-    # data_dict_size = len(data_dict)
     for layer_name, data_frame in data_dict.items():
         # initialize X matrix, and Y vector
         X, Y = list(), list()
@@ -282,3 +309,35 @@ def return_data_object(data_dict):
         data_dict[layer_name] = {'data': X, 'y_vector': Y}
 
     return data_dict
+
+
+def missplanned(layer_name):
+
+    path_planned = './datadump/'+layer_name+'/PLANNED/'
+    path_worked = './datadump/'+layer_name+'/WORKED/'+layer_name+'_WORKED'
+
+    data_planned = pd.DataFrame()
+    data_worked = pd.DataFrame()
+
+    total = 0
+    counter = 0
+
+    for index, filename in enumerate(os.listdir(path_planned)):
+
+        data_planned = pd.read_csv(path_planned + filename, sep=';')
+        layer = filename.split("PLANNED")[1]
+        data_worked = pd.read_csv(path_worked + layer, sep=';')
+
+        for row in data_planned.iterrows():
+            date_planned = row[1]['date']
+            hours_planned = row[1]['hours']
+            hours_worked = data_worked[data_worked['date'] == date_planned]['hours']
+            hours_worked = hours_worked.tolist()[0]
+            hours_wrong = abs(hours_planned-hours_worked)
+
+            total = hours_wrong + total
+            counter += 1
+
+    print('The planner for ' + layer_name + ' missplanned an average of ' + str(total/counter) + ' hours per day.')
+
+fetch_data()

@@ -24,6 +24,7 @@ def compute_layer_correlation(data_dict):
             print('Correlation vector for %s:' % layer_name,
                   compute_correlation(data_frame['data'], data_frame['y_vector']))
 
+
 def create_linear_models(data_dict):
     for type_schedule, schedule in data_dict.items():
         print(type_schedule)
@@ -36,4 +37,4 @@ def create_linear_models(data_dict):
 
 
 compute_layer_correlation(company_37_branch_141)
-create_linear_models(company_37_branch_141)
+# create_linear_models(company_37_branch_141)
