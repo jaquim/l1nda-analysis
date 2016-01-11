@@ -2,7 +2,7 @@
 """
 Created on Wed Jan  6 12:06:14 2016
 
-@author: gebruiker
+@author: Simon Hoekman
 """
 
 import pandas as pandas

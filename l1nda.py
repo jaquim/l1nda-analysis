@@ -6,6 +6,7 @@ import pandas as pd
 import warnings
 import os
 import shutil
+from progress.bar import Bar
 from datetime import date, timedelta
 import datetime
 
@@ -109,6 +110,12 @@ def fetch_layers(data_frame, output_path):
 
     layer_dict = dict()
     grouped = data_frame.groupby('layer_name')
+
+    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
+              max=len(grouped),
+              fill='-',
+              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
+
     for name, group in grouped:
 
         layer = group.groupby('date')['hours'].sum().reset_index()
@@ -119,9 +126,23 @@ def fetch_layers(data_frame, output_path):
         layer = add_last_week(layer)
         layer = add_hours(layer)
 
+        layer = order_layer(layer)
+
         layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=';')
         layer_dict[name] = layer
+
+        bar.next()
+    bar.finish()
     return layer_dict
+
+
+def order_layer(layer):
+    # arrange columns in right order
+    header = layer.columns.tolist()
+    header = header[0:1] + header[2:] + header[1:2]
+    layer = layer[header]
+
+    return layer
 
 
 def add_hours(layer):
@@ -247,7 +268,6 @@ def return_data_object(data_dict):
     # data_dict = (data_dict - data_dict.mean()) / (data_dict.max() - data_dict.min())
     # data_dict_size = len(data_dict)
     for layer_name, data_frame in data_dict.items():
-        print('A')
         # initialize X matrix, and Y vector
         X, Y = list(), list()
         for index, row in data_frame.iterrows():
