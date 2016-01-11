@@ -339,5 +339,3 @@ def missplanned(layer_name):
             counter += 1
 
     print('The planner for ' + layer_name + ' missplanned an average of ' + str(total/counter) + ' hours per day.')
-
-fetch_data()
