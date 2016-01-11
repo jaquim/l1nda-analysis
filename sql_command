@@ -33,7 +33,7 @@ inner join
 inner join
 		dwh.event_version on dwh.event.id = dwh.event_version.event_id
 where
-		dwh.layer.type = 'schedule' and dwh.event_version.start < '20160101'
+		dwh.domain.id = 37 and dwh.layer.type = 'schedule' and dwh.event_version.start < '20160101'
 order by
 		dwh.domain.id, dwh.affiliate.id, dwh.layer.name, dwh.event_version.start
 );

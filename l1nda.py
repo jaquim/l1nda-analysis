@@ -51,7 +51,9 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # input file
-file_name = 'COMPANY_37_BRANCH_141'
+file_name = 'COMPANY_59_BRANCH_362'
+
+write_to_csv = False
 
 
 def fetch_data():
@@ -59,13 +61,14 @@ def fetch_data():
     # create directory for the data to be placed in
     datadump_dir = './datadump/' + file_name
 
-    # check if datadump_dir exists, if so, remove
-    if os.path.exists(datadump_dir):
-        shutil.rmtree(datadump_dir)
+    if write_to_csv == True:
+        # check if datadump_dir exists, if so, remove
+        if os.path.exists(datadump_dir):
+            shutil.rmtree(datadump_dir)
+        os.mkdir('./datadump/' + file_name)
 
     # read in data file and create datadump_dir named according file_name
     input_path = './datadump/' + file_name + '.csv'
-    os.mkdir('./datadump/' + file_name)
 
     # instantiate pandas dataframe
     data = pd.read_csv(input_path)
@@ -106,7 +109,8 @@ def transform_data(data_frame, output_path):
 def fetch_layers(data_frame, output_path):
 
     output_dir = './datadump/' + file_name + '/' + output_path
-    os.mkdir(output_dir)
+    if write_to_csv == True:
+        os.mkdir(output_dir)
 
     layer_dict = dict()
     grouped = data_frame.groupby('layer_name')
@@ -127,8 +131,8 @@ def fetch_layers(data_frame, output_path):
         layer = add_hours(layer)
 
         layer = order_layer(layer)
-
-        layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=';')
+        if write_to_csv == True:
+            layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=';')
         layer_dict[name] = layer
 
         bar.next()
@@ -224,7 +228,7 @@ def add_historical_data(layer):
             hours.append(0)
         last_year_hours.append(round(hours[0], 2))
 
-    layer['lastweek_worked_hours'] = last_week_hours
+    layer['last_week_worked_hours'] = last_week_hours
     layer['last_year_worked_hours'] = last_year_hours
 
     return layer

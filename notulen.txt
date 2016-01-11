@@ -78,15 +78,45 @@ Donderdag 7-01-2016
 	Vandaag hebben we werkend gekregen dat we per bedrijf data kunnen opvragen, ook de gewerkte uren zijn goed nu op te vragen, dit bleek te zijn dat het forward_id == id. We hebben voorelkaar gekregen om de data te splitsen per filiaal per zogenaamde layer, bijv keuken enz. Hierna hebben we per dag de gewerkte shifts bij elkaar opgeteld om zo een overzicht te krijgen van gewerkte uren per dag. Plan voor morgen is om per datum de dag van de week op te vragen. Ook de weercijfers zijn goed dus die kunnen we nu toevoegen aan de data. Om het weercijfer te berekenen, hebben we een de oorspronkelijke formule van het weercijfer iets aangepast zodat het te berekenen was met de data van het KNMI. Het gevolg hiervan is dat de mist niet verwerkt is in het weercijfer maar enkel de bedekkingsfactor, de neerslag en de wind. De volgende stap is het toevoegen van de weercijfers aan de rest van de data. Hierna zijn we waarschijnlijk bijna klaar met het preprocessen van de data en kunnen we aan de slag met het verwerken.
 
 Vrijdag 8-01-2016
+
 	I didn't have to use my AK, today was a good day.
 	Vandaag is bijna alle preprosessing voltooid. Veel tijd heeft gezeten in het schrijven van python code die de juiste infor uit de data kan halen. Er is nu een script geschreven om de gewerkte uren van dezelfde dag, de week ervoor toe te voegen. Ook is er een script geschreven die het gemiddeld aantal gewerkte uren per weekdag toe voegt als feature. Met het kleinde beetje data dat beschikbaar was aan het begin van de dag, zijn de eerste probeersels van een voorspelling al gedaan. Dit was vooral om te leren werken met de leeralgoritmes.
+
+Maandag 11-01-2016
+
+	Meerdere fillialen naar csv geschreven, deze bleken te werken bij het inlezen van de geschreven python code. Hieruit blijkt dat we een generalisering kunnen maken naar het automatisch inlezen van meerdere data (.csv) files. Feature feestdagen en feature last year toegevoegd. Weka bekeken en algoritmen uitgeprobeerd, linear regression lijkt goed te werken. Voor sommige modellen lijkt last_year_working_hours niet in de variabelen te worden opgenomen. Bespreking met Eva gehad, waarin we hebben besproken waar we staan, hoe we op de tijd zitten, wat we gaan doen. Gevraagd naar suggesties voor mogelijke andere features. Ook hebben we een functie geschreven om de gemiddelde fout van de planner te berekenen. We kwamen tot de conclusie dat die gemiddelde fout groter is dan verwacht. Uit onze eerste resultaat met linear regression kwam namelijk ongeveer een fout van 5 uur uitrollen. Dit verschil is het bespreken nog even waard, evenals welke algortimen we gaan toepassen. Ook moeten we nog even bespreken wat we doen met nullen in bepaalde feature kolommen. Voor de last_year_worked_hours en last_week_worked_hours bijvoorbeeld betekent een nul dat er niet gewerkt is, maar die nul die dat encodeert heeft naar alle waarschijnlijkheid negatieve invloed op de data modellering. Ook blijkt er een 'nan' (zoals te zien in de resultaten) te zitten bij het berekenen van de correlaties tussen de features en de gewerkte uren. Dit verdient ook nog wat aandacht.
 
 
 ---------------------------------------------------------
 
 Resultaten:
 
-Correlatie tussen weer en gewerkte uren:
+Correlatie tussen weer en gewerkte uren (COMPANY_37_BRANCH_141) :
 [0.016853422257149978]	
+
+Resultaten voor (COMPANY_59_BRANCH_362):
+(index van de correlatie vector komt overeen met de volgende feature vector:
+
+['date', 'festivity', 'weather_grades', 'mean_weekday_lastyear', 'last_week_worked_hours', 'last_year_worked_hours', 'hours'])
+
+	WORKED
+	('Correlation vector for layer1070:', [0.027915779373015447, 0.016624941011913166, 0.14057950976810696, 0.14637363121998567, 0.0079283539014961459])
+	('Correlation vector for layer1071:', [-0.025181294712516393, 0.052169603435226704, 0.21765743717566358, 0.44096186266491638, 0.00085650188240907687])
+	('Correlation vector for layer1074:', [-0.031584566968365389, 0.041954985641699527, 0.1524523600147619, 0.51866286743687495, 0.074522645581297828])
+	('Correlation vector for layer1075:', [0.012652733297331705, 0.0062941641305723243, 0.33875080437535426, 0.44592003275611214, 0.078682456489180305])
+	('Correlation vector for layer1069:', [0.082651658691454605, 0.0092961470851882187, 0.0096911467102168379, 0.55083406505861421, -0.16158787409540856])
+	('Correlation vector for layer1078:', [-0.061918844985224798, 0.095156933198923599, 0.34882232729306001, 0.69740042096917965, -0.028885214289630354])
+	('Correlation vector for layer1079:', [0.25539712876793741, -0.20740963489091105, 0.37481777249996778, 0.22724642892293984, nan])
+	('Correlation vector for layer1080:', [-0.012993736873968414, 0.0055719768227102048, 0.10279790089556651, 0.71757794421204513, -0.080828399267601631])
+
+	PLANNED
+	('Correlation vector for layer1070:', [0.032499737727585791, 0.030820441933334303, 0.13769134732214142, 0.026887481609642404, 0.023066440892467312])
+	('Correlation vector for layer1071:', [-0.0042967358396847951, -0.025382683357740684, 0.48444128696371014, 0.65010628429249517, -0.13482243842172081])
+	('Correlation vector for layer1074:', [0.011270011052653279, 0.093985014638080927, 0.026289684135746408, 0.65535682409476836, 0.051163602122388088])
+	('Correlation vector for layer1075:', [-0.012070969163845506, 0.013517950955624998, 0.39786996377005601, 0.49159593287106584, 0.065193117809661763])
+	('Correlation vector for layer1069:', [-0.049573019330857726, 0.079892380223530457, 0.085279918197371893, 0.27647313339531349, 0.29951456345605321])
+	('Correlation vector for layer1078:', [nan, 0.10035064845793029, 0.36722766132079493, 0.49308324353861072, 0.086801229094476157])
+	('Correlation vector for layer1079:', [0.12474958455498104, -0.231582236084237, 0.386785486918863, -0.17871460095571182, nan])
+	('Correlation vector for layer1080:', [-0.044117191825797784, 0.058580613375597029, 0.1904128073348334, 0.66337779415600573, -0.070909886743329778])
 
 
