@@ -95,8 +95,8 @@ def fetch_data():
     data_worked = transform_data(data_worked, 'WORKED')
     data_planned = transform_data(data_planned, 'PLANNED')
 
-    company_data = {'WORKED': return_data_object(data_worked),
-                    'PLANNED': return_data_object(data_planned)}
+    company_data = {'WORKED': data_worked,
+                    'PLANNED': data_planned}
 
     print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
           % (features, len(layers), layers))
@@ -113,10 +113,6 @@ def transform_data(data_frame, output_path):
     # transform date, start, and end columns entries from
     # database csv dump into datetimeobjects
     data_frame['date'] = start.dt.strftime('%Y-%m-%d')
-
-    if filter_2015 is True:
-        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
-
     data_frame['start'] = start.dt.strftime('%H:%M:%S')
     data_frame['end'] = end.dt.strftime('%H:%M:%S')
     # calculate the time delta, resulting in the actual worked hours
@@ -155,8 +151,10 @@ def fetch_layers(data_frame, output_path):
         layer = add_hours(layer)
 
         layer = order_layer(layer)
+        if filter_2015 is True:
+            layer = layer[(layer['date'] > '2014-12-31')]
         if write_to_csv == True:
-            layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=';')
+            layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=';', index=False)
         layer_dict[name] = layer
 
         bar.next()
