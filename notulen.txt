@@ -210,4 +210,41 @@ Correlation for layer1080:
 Mean correlation for COMPANY_59_BRANCH_362:
  [('festivity', nan), ('weather_grades', 0.015022766267765036), ('mean_weekday_lastyear', 0.25954806283755005), ('last_week_worked_hours', 0.38477076162527379), ('last_year_worked_hours', nan)]
 
+
+ COMPANY_25_BRANCH_81:
+
+Composing layers by computing features for WORKED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 8s
+Composing layers by computing features for PLANNED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 8s
+
+Present features:
+['festivity', 'weather_grades', 'last_10_weekdays', 'mean_weekday_lastyear', 'lastweek_worked_hours']
+Present layers (2):
+['layer290', 'layer291']
+
+                            OLS Regression Results
+==============================================================================
+Dep. Variable:                  hours   R-squared:                       0.838
+Model:                            OLS   Adj. R-squared:                  0.837
+Method:                 Least Squares   F-statistic:                     1250.
+Date:                Tue, 12 Jan 2016   Prob (F-statistic):               0.00
+Time:                        17:05:51   Log-Likelihood:                -6399.7
+No. Observations:                1214   AIC:                         1.281e+04
+Df Residuals:                    1209   BIC:                         1.284e+04
+Df Model:                           5
+Covariance Type:            nonrobust
+=========================================================================================
+                            coef    std err          t      P>|t|      [95.0% Conf. Int.]
+-----------------------------------------------------------------------------------------
+festivity                 4.1949      9.039      0.464      0.643       -13.540    21.929
+weather_grades            2.1147      0.590      3.583      0.000         0.957     3.273
+last_10_weekdays          0.5722      0.049     11.611      0.000         0.476     0.669
+mean_weekday_lastyear     0.0217      0.050      0.433      0.665        -0.077     0.120
+lastweek_worked_hours     0.2760      0.029      9.587      0.000         0.220     0.333
+==============================================================================
+Omnibus:                      879.164   Durbin-Watson:                   0.750
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            19783.557
+Skew:                           3.091   Prob(JB):                         0.00
+Kurtosis:                      21.785   Cond. No.                     1.26e+03
+==============================================================================
+
  ***********************************************************************************************************************
