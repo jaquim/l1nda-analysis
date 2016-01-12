@@ -2,38 +2,35 @@ import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 
-layer = 'layer977'
-company_branch = 'COMPANY_50_BRANCH_340'
+layer = 'layer291'
+company_branch = 'COMPANY_25_BRANCH_81'
 
 
 def read_data_log_reg(file_name, sep):
     data = pandas.read_csv(file_name, sep=sep)
     return data
 
-
-
-def calc_pred_2(data_worked, data_planned, data_date):
+def calc_pred_2(data_worked, data_planned):
     prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
-    for index in enumerate(data_date):
-        print data_date[index]
-        break
-
-
-
-def calc_pred(data_worked, data_planned, data_date):
-    prediction_list, hours_list = list(), list()
-    for row in data_worked.iterrows():
-        prediction = 16.1251 * row[1]['festivity'] + 1.0374 * row[1]['weather_grades'] + 0.4132 * row[1]['mean_weekday_lastyear'] + 0.4991 * row[1]['last_week_worked_hours'] + 0.1518 * row[1]['last_year_worked_hours'] - 9.1044
-        prediction_list.append(prediction)
-        hours_list.append(row[1]['hours'])
-    planned_list, date_list = list(), list()
-    for row in data_planned.iterrows():
-        planned_list.append(row[1]['hours'])
-    for row in data_date.iterrows():
-        date_list.append(row[1]['date'])
+    for element_planned in data_planned:
+        for element_worked in data_worked:
+            if np.ravel(element_planned)[0] == np.ravel(element_worked)[0]:
+                date_list.append(np.ravel(element_planned)[0])
+                ##########
+                # np.ravel(element_worked)[0] = festivity
+                # np.ravel(element_worked)[1] = festivity
+                # np.ravel(element_worked)[2] = weather_grades
+                # np.ravel(element_worked)[3] = mean_weekday_lastyear
+                # np.ravel(element_worked)[4] = last_week_worked_hours
+                # np.ravel(element_worked)[5] = last_year_worked_hours
+                ##########
+                prediction = 0.6661 * np.ravel(element_worked)[3] + 0.8394 * np.ravel(element_worked)[4] - 32.5839
+                prediction_list.append(prediction)
+                hours_list.append(np.ravel(element_worked)[6])
+                planned_list.append(np.ravel(element_planned)[6])
     return prediction_list, hours_list, planned_list, date_list
 
-def plot_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
+def save_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
     plt.figure(0)
     plt.ylabel('Hours')
     plt.xlabel('Date in days')
@@ -46,7 +43,7 @@ def plot_results_real(prediction_list, hours_list, planned_list, date_list, file
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
 
-def plot_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
+def save_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
     diff_prediction = np.array(hours_list) - np.array(prediction_list)
     # print np.array(hours_list)
     # print np.array(prediction_list)
@@ -65,9 +62,8 @@ def plot_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
 
 
-data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + 'test.csv', sep=',')
-data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + 'test.csv', sep=',')
-data_date = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch + '_PLANNED_' + layer + '.csv', sep =',')
-prediction_list, hours_list, planned_list, date_list= calc_pred_2(data_worked, data_planned, data_date)
-plot_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
-plot_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + '.csv', sep=';')
+data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + '.csv', sep=';')
+prediction_list, hours_list, planned_list, date_list= calc_pred_2(np.matrix(data_worked), np.matrix(data_planned))
+save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
