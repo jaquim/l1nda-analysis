@@ -86,6 +86,11 @@ Maandag 11-01-2016
 
 	Meerdere fillialen naar csv geschreven, deze bleken te werken bij het inlezen van de geschreven python code. Hieruit blijkt dat we een generalisering kunnen maken naar het automatisch inlezen van meerdere data (.csv) files. Feature feestdagen en feature last year toegevoegd. Weka bekeken en algoritmen uitgeprobeerd, linear regression lijkt goed te werken. Voor sommige modellen lijkt last_year_working_hours niet in de variabelen te worden opgenomen. Bespreking met Eva gehad, waarin we hebben besproken waar we staan, hoe we op de tijd zitten, wat we gaan doen. Gevraagd naar suggesties voor mogelijke andere features. Ook hebben we een functie geschreven om de gemiddelde fout van de planner te berekenen. We kwamen tot de conclusie dat die gemiddelde fout groter is dan verwacht. Uit onze eerste resultaat met linear regression kwam namelijk ongeveer een fout van 5 uur uitrollen. Dit verschil is het bespreken nog even waard, evenals welke algortimen we gaan toepassen. Ook moeten we nog even bespreken wat we doen met nullen in bepaalde feature kolommen. Voor de last_year_worked_hours en last_week_worked_hours bijvoorbeeld betekent een nul dat er niet gewerkt is, maar die nul die dat encodeert heeft naar alle waarschijnlijkheid negatieve invloed op de data modellering. Ook blijkt er een 'nan' (zoals te zien in de resultaten) te zitten bij het berekenen van de correlaties tussen de features en de gewerkte uren. Dit verdient ook nog wat aandacht.
 
+Dinsdag 12-01-2016
+
+	nan correlaties?
+
+	Resultaten van meerdere fillialen plotten met Weka. Script om de correlation per layer en per filiaal te krijgen. Dit om de wensen van L1nda tegemoet te komen om goed voorspellende features te vinden. Besloten om nog te wachten wat we moeten doen met de nullen die bij sommige features te voorschijn komen. Hier vragen we Eva en/of Maarten over. Python implementatie van de regressie werkend te krijgen om iets anders dan Weka te hebben. Feature gemaakt voor gemiddelde gewerkte uren van de zelfde weekdag per afgelopen 10 weken. De resultaten van de nieuwe feature lijken dichtbij een reeds bestaande te liggen. De overweging moet gemaakt worden of we deze toe willen voegen of niet. 
 
 ---------------------------------------------------------
 
@@ -93,6 +98,10 @@ Resultaten:
 
 Correlatie tussen weer en gewerkte uren (COMPANY_37_BRANCH_141) :
 [0.016853422257149978]	
+
+************************************************************************************************************************
+
+Maandag 11-01-2016:
 
 Resultaten voor (COMPANY_59_BRANCH_362):
 (index van de correlatie vector komt overeen met de volgende feature vector:
@@ -120,3 +129,85 @@ Resultaten voor (COMPANY_59_BRANCH_362):
 	('Correlation vector for layer1080:', [-0.044117191825797784, 0.058580613375597029, 0.1904128073348334, 0.66337779415600573, -0.070909886743329778])
 
 
+************************************************************************************************************************
+
+Dinsdag 12-01-2016:
+
+COMPANY_25_BRANCH_81:
+
+Composing layers by computing features for WORKED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 5s
+Composing layers by computing features for PLANNED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 5s
+
+Present features:
+['festivity', 'weather_grades', 'mean_weekday_lastyear', 'last_week_worked_hours', 'last_year_worked_hours']
+Present layers (2):
+['layer290', 'layer291']
+
+WORKED schedule:
+Correlation for layer290:
+ [('festivity', -0.018625726128601694), ('weather_grades', 0.14184377848554544), ('mean_weekday_lastyear', 0.20083257465974122), ('last_week_worked_hours', 0.49458236666656397), ('last_year_worked_hours', 0.3688029289002707)]
+Correlation for layer291:
+ [('festivity', 0.01839595922685159), ('weather_grades', 0.07037686456907388), ('mean_weekday_lastyear', 0.14987513321667068), ('last_week_worked_hours', 0.2527710606552945), ('last_year_worked_hours', 0.4838156961545198)]
+Mean correlation for COMPANY_25_BRANCH_81:
+ [('festivity', -0.00011488345087505222), ('weather_grades', 0.10611032152730966), ('mean_weekday_lastyear', 0.17535385393820596), ('last_week_worked_hours', 0.37367671366092925), ('last_year_worked_hours', 0.42630931252739523)]
+
+PLANNED schedule:
+Correlation for layer290:
+ [('festivity', -0.022278902263115453), ('weather_grades', 0.1220778290067673), ('mean_weekday_lastyear', 0.3200805597581068), ('last_week_worked_hours', 0.4245311545337718), ('last_year_worked_hours', 0.5691687333587883)]
+Correlation for layer291:
+ [('festivity', -0.02398978189556456), ('weather_grades', 0.12018253723017244), ('mean_weekday_lastyear', 0.1744052934249235), ('last_week_worked_hours', 0.7237483385624639), ('last_year_worked_hours', 0.7471176998952911)]
+Mean correlation for COMPANY_25_BRANCH_81:
+ [('festivity', -0.023134342079340009), ('weather_grades', 0.12113018311846988), ('mean_weekday_lastyear', 0.24724292659151514), ('last_week_worked_hours', 0.57413974654811784), ('last_year_worked_hours', 0.65814321662703967)]
+
+
+ COMPANY_59_BRANCH_362:
+
+Composing layers by computing features for WORKED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 14s
+Composing layers by computing features for PLANNED schedule:  |--------------------------------| 100.0% - Time remaining: 0s - Time elapsed: 13s
+
+Present features:
+['festivity', 'weather_grades', 'mean_weekday_lastyear', 'last_week_worked_hours', 'last_year_worked_hours']
+Present layers (8):
+['layer1069', 'layer1070', 'layer1071', 'layer1074', 'layer1075', 'layer1078', 'layer1079', 'layer1080']
+
+WORKED schedule:
+Correlation for layer1070:
+ [('festivity', 0.027915779373015447), ('weather_grades', 0.016624941011913166), ('mean_weekday_lastyear', 0.14047948334340307), ('last_week_worked_hours', 0.14637363121998567), ('last_year_worked_hours', 0.007928353901496146)]
+Correlation for layer1071:
+ [('festivity', -0.025181294712516393), ('weather_grades', 0.052169603435226704), ('mean_weekday_lastyear', 0.21761781696066554), ('last_week_worked_hours', 0.4409618626649164), ('last_year_worked_hours', 0.0008565018824090769)]
+Correlation for layer1074:
+ [('festivity', -0.03158456696836539), ('weather_grades', 0.04195498564169953), ('mean_weekday_lastyear', 0.15248649670755307), ('last_week_worked_hours', 0.518662867436875), ('last_year_worked_hours', 0.07452264558129783)]
+Correlation for layer1075:
+ [('festivity', 0.012652733297331705), ('weather_grades', 0.006294164130572324), ('mean_weekday_lastyear', 0.33853948829007285), ('last_week_worked_hours', 0.44592003275611214), ('last_year_worked_hours', 0.0786824564891803)]
+Correlation for layer1069:
+ [('festivity', 0.0826516586914546), ('weather_grades', 0.009296147085188219), ('mean_weekday_lastyear', 0.009748598673733013), ('last_week_worked_hours', 0.5508340650586142), ('last_year_worked_hours', -0.16158787409540856)]
+Correlation for layer1078:
+ [('festivity', -0.0619188449852248), ('weather_grades', 0.0951569331989236), ('mean_weekday_lastyear', 0.34886340961109064), ('last_week_worked_hours', 0.6974004209691796), ('last_year_worked_hours', -0.028885214289630354)]
+Correlation for layer1079:
+ [('festivity', 0.2553971287679374), ('weather_grades', -0.20740963489091105), ('mean_weekday_lastyear', 0.3748353880180155), ('last_week_worked_hours', 0.22724642892293984), ('last_year_worked_hours', nan)]
+Correlation for layer1080:
+ [('festivity', -0.012993736873968414), ('weather_grades', 0.005571976822710205), ('mean_weekday_lastyear', 0.10252517678383222), ('last_week_worked_hours', 0.7175779442120451), ('last_year_worked_hours', -0.08082839926760163)]
+Mean correlation for COMPANY_59_BRANCH_362:
+ [('festivity', 0.03086735707370802), ('weather_grades', 0.0024573895544153365), ('mean_weekday_lastyear', 0.21063698229854574), ('last_week_worked_hours', 0.4681221566550835), ('last_year_worked_hours', nan)]
+
+PLANNED schedule:
+Correlation for layer1070:
+ [('festivity', 0.03249973772758579), ('weather_grades', 0.030820441933334303), ('mean_weekday_lastyear', 0.1376732669263664), ('last_week_worked_hours', 0.026887481609642404), ('last_year_worked_hours', 0.023066440892467312)]
+Correlation for layer1071:
+ [('festivity', -0.004296735839684795), ('weather_grades', -0.025382683357740684), ('mean_weekday_lastyear', 0.484431246297949), ('last_week_worked_hours', 0.6501062842924952), ('last_year_worked_hours', -0.1348224384217208)]
+Correlation for layer1074:
+ [('festivity', 0.01127001105265328), ('weather_grades', 0.09398501463808093), ('mean_weekday_lastyear', 0.026183875367719742), ('last_week_worked_hours', 0.6553568240947684), ('last_year_worked_hours', 0.05116360212238809)]
+Correlation for layer1075:
+ [('festivity', -0.012070969163845506), ('weather_grades', 0.013517950955624998), ('mean_weekday_lastyear', 0.3978666357434941), ('last_week_worked_hours', 0.49159593287106584), ('last_year_worked_hours', 0.06519311780966176)]
+Correlation for layer1069:
+ [('festivity', -0.049573019330857726), ('weather_grades', 0.07989238022353046), ('mean_weekday_lastyear', 0.0851889835371821), ('last_week_worked_hours', 0.2764731333953135), ('last_year_worked_hours', 0.2995145634560532)]
+Correlation for layer1078:
+ [('festivity', nan), ('weather_grades', 0.10035064845793029), ('mean_weekday_lastyear', 0.36734121887878307), ('last_week_worked_hours', 0.4930832435386107), ('last_year_worked_hours', 0.08680122909447616)]
+Correlation for layer1079:
+ [('festivity', 0.12474958455498104), ('weather_grades', -0.231582236084237), ('mean_weekday_lastyear', 0.3867990085567098), ('last_week_worked_hours', -0.17871460095571182), ('last_year_worked_hours', nan)]
+Correlation for layer1080:
+ [('festivity', -0.044117191825797784), ('weather_grades', 0.05858061337559703), ('mean_weekday_lastyear', 0.1909002673921958), ('last_week_worked_hours', 0.6633777941560057), ('last_year_worked_hours', -0.07090988674332978)]
+Mean correlation for COMPANY_59_BRANCH_362:
+ [('festivity', nan), ('weather_grades', 0.015022766267765036), ('mean_weekday_lastyear', 0.25954806283755005), ('last_week_worked_hours', 0.38477076162527379), ('last_year_worked_hours', nan)]
+
+ ***********************************************************************************************************************
