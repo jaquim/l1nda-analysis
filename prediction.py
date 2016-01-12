@@ -2,8 +2,8 @@ import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 
-layer = 'layer291'
-company_branch = 'COMPANY_25_BRANCH_81'
+layer = 'layer1069'
+company_branch = 'COMPANY_59_BRANCH_362'
 
 
 def read_data_log_reg(file_name, sep):
@@ -17,14 +17,14 @@ def calc_pred_2(data_worked, data_planned):
             if np.ravel(element_planned)[0] == np.ravel(element_worked)[0]:
                 date_list.append(np.ravel(element_planned)[0])
                 ##########
-                # np.ravel(element_worked)[0] = festivity
                 # np.ravel(element_worked)[1] = festivity
                 # np.ravel(element_worked)[2] = weather_grades
-                # np.ravel(element_worked)[3] = mean_weekday_lastyear
-                # np.ravel(element_worked)[4] = last_week_worked_hours
-                # np.ravel(element_worked)[5] = last_year_worked_hours
+                # np.ravel(element_worked)[3] = last_10_weekdays
+                # np.ravel(element_worked)[4] = mean_weekday_lastyear
+                # np.ravel(element_worked)[5] = last_week_worked_hours
+                # np.ravel(element_worked)[6] = last_year_worked_hours
                 ##########
-                prediction = 0.6661 * np.ravel(element_worked)[3] + 0.8394 * np.ravel(element_worked)[4] - 32.5839
+                prediction = 11.6234 * np.ravel(element_worked)[1] + 0.2034 * np.ravel(element_worked)[3] + 0.4719 * np.ravel(element_worked)[5] + 5.094
                 prediction_list.append(prediction)
                 hours_list.append(np.ravel(element_worked)[6])
                 planned_list.append(np.ravel(element_planned)[6])
