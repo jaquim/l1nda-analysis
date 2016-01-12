@@ -11,6 +11,15 @@ def read_data_log_reg(file_name, sep):
     return data
 
 
+
+def calc_pred_2(data_worked, data_planned, data_date):
+    prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
+    for index in enumerate(data_date):
+        print data_date[index]
+        break
+
+
+
 def calc_pred(data_worked, data_planned, data_date):
     prediction_list, hours_list = list(), list()
     for row in data_worked.iterrows():
@@ -59,6 +68,6 @@ def plot_results_difference(prediction_list, hours_list, planned_list, date_list
 data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + 'test.csv', sep=',')
 data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + 'test.csv', sep=',')
 data_date = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch + '_PLANNED_' + layer + '.csv', sep =',')
-prediction_list, hours_list, planned_list, date_list= calc_pred(data_worked, data_planned, data_date)
+prediction_list, hours_list, planned_list, date_list= calc_pred_2(data_worked, data_planned, data_date)
 plot_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
 plot_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
