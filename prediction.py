@@ -2,6 +2,9 @@ import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 
+layer = 'layer928'
+company_branch = 'COMPANY_45_BRANCH_325'
+
 
 def read_data_log_reg(file_name, sep):
     data = pandas.read_csv(file_name, sep=sep)
@@ -31,7 +34,7 @@ def plot_results_real(prediction_list, hours_list, planned_list, date_list, file
     plt.plot(hours_list, label='real hours')
     plt.xticks(range(len(date_list)), date_list)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-#    plt.savefig(file_name + '_hours.png')
+    plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
 
 def plot_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
     diff_prediction = np.array(hours_list) - np.array(prediction_list)
@@ -48,12 +51,12 @@ def plot_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.plot(diff_planner, label='planner')
     plt.xticks(range(len(date_list)), date_list)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(file_name + '_difference.png')
+    plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
 
 
-data_worked = read_data_log_reg('datadump/COMPANY_45_BRANCH_325/WORKED/COMPANY_45_BRANCH_325_WORKED_layer929test.csv', sep=',')
-data_planned = read_data_log_reg('datadump/COMPANY_45_BRANCH_325/PLANNED/COMPANY_45_BRANCH_325_PLANNED_layer929test.csv', sep=',')
-data_date = read_data_log_reg('datadump/COMPANY_45_BRANCH_325/PLANNED/COMPANY_45_BRANCH_325_PLANNED_layer929.csv', sep =',')
+data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + 'test.csv', sep=',')
+data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + 'test.csv', sep=',')
+data_date = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch + '_PLANNED_' + layer + '.csv', sep =',')
 prediction_list, hours_list, planned_list, date_list= calc_pred(data_worked, data_planned, data_date)
-plot_results_real(prediction_list, hours_list, planned_list, date_list, 'COMPANY_45_BRANCH_325_PLANNED_layer929')
-plot_results_difference(prediction_list, hours_list, planned_list, date_list, 'COMPANY_45_BRANCH_325_PLANNED_layer929')
+plot_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+plot_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
