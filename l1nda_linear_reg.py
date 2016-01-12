@@ -4,6 +4,7 @@ from scipy.stats import pearsonr
 import numpy as np
 import pandas as pd
 import l1nda
+import statsmodels.api as sm
 
 
 company_37_branch_141 = l1nda.fetch_data()
@@ -44,9 +45,12 @@ def compute_layer_correlation(data_dict):
 
 def create_linear_models(data_dict):
     for type_schedule, schedule in data_dict.items():
-        print(type_schedule)
-        for data_frame in schedule.values():
-            break
+        if type_schedule == 'WORKED':
+            for layer_name, data_frame in schedule.items():
+                X = data_frame[features]
+                y = data_frame['hours']
+                est = sm.OLS(y, X).fit()
+                print(est.summary())
 
-compute_layer_correlation(company_37_branch_141)
-# create_linear_models(company_37_branch_141)
+# compute_layer_correlation(company_37_branch_141)
+create_linear_models(company_37_branch_141)
