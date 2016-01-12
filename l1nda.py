@@ -51,12 +51,19 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # input file
-file_name = 'COMPANY_59_BRANCH_362'
+file_name = 'COMPANY_25_BRANCH_81'
 
+# features to be extracted
+features = list()
+# layers present
+layers = list()
+
+# option to write layers to csv
 write_to_csv = False
 
 
 def fetch_data():
+    print(file_name + ':\n')
 
     # create directory for the data to be placed in
     datadump_dir = './datadump/' + file_name
@@ -88,6 +95,9 @@ def fetch_data():
     company_data = {'WORKED': return_data_object(data_worked),
                     'PLANNED': return_data_object(data_planned)}
 
+    print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
+          % (features, len(layers), layers))
+
     return company_data
 
 
@@ -108,18 +118,23 @@ def transform_data(data_frame, output_path):
 
 def fetch_layers(data_frame, output_path):
 
+    global layers
+
     output_dir = './datadump/' + file_name + '/' + output_path
+
     if write_to_csv == True:
         os.mkdir(output_dir)
 
-    layer_dict = dict()
     grouped = data_frame.groupby('layer_name')
+
+    layers = [name for name, _ in grouped]
 
     bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
               max=len(grouped),
               fill='-',
               suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
+    layer_dict = dict()
     for name, group in grouped:
 
         layer = group.groupby('date')['hours'].sum().reset_index()
@@ -141,9 +156,12 @@ def fetch_layers(data_frame, output_path):
 
 
 def order_layer(layer):
+    global features
     # arrange columns in right order
     header = layer.columns.tolist()
     header = header[0:1] + header[2:] + header[1:2]
+
+    features = header[1:6]
     layer = layer[header]
 
     return layer
@@ -270,7 +288,7 @@ def custom_mean(grp):
 
     mean = totalhours/counter
 
-    grp['mean_weekday_lastyear'] = mean.total_seconds()/3600
+    grp['mean_weekday_lastyear'] = round(mean.total_seconds()/3600, 2)
 
     return grp
 
