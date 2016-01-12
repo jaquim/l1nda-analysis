@@ -59,10 +59,10 @@ features = list()
 layers = list()
 
 # option to write layers to csv
-write_to_csv = True
+write_to_csv = False
 
 # for smaller test sets:
-filter_2015 = True
+filter_2015 = False
 
 
 def fetch_data():
@@ -146,6 +146,7 @@ def fetch_layers(data_frame, output_path):
 
         layer = add_festivities(layer)
         layer = add_weather(layer)
+        layer = add_mean_weekday_last_10(layer)
         layer = add_mean_weekday_lastyear(layer)
         layer = add_historical_data(layer)
         layer = add_hours(layer)
@@ -209,7 +210,8 @@ def add_historical_data(layer):
     last_year_hours = list()
 
     # for every entry (day)
-    for today in layer['date']:
+    for row in layer.iterrows():
+        today = row[1]['date']
         # changes the string to a datetime object
         today = datetime.datetime.strptime(today, "%Y-%m-%d").date()
         offset = timedelta(days=7)
@@ -226,7 +228,7 @@ def add_historical_data(layer):
         hours = (hours.dt.total_seconds()/3600)
         hours = hours.tolist()
         if hours == []:
-            hours.append(0)
+            hours = [row[1]['last_10_weekdays']]
         last_week_hours.append(round(hours[0], 2))
 
 # ------------- Does the same for last year, same day of the week --------
@@ -250,13 +252,47 @@ def add_historical_data(layer):
         hours = (hours.dt.total_seconds()/3600)
         hours = hours.tolist()
         if hours == []:
-            hours.append(0)
+            hours = [row[1]['last_10_weekdays']]
         last_year_hours.append(round(hours[0], 2))
 
-    layer['last_week_worked_hours'] = last_week_hours
+    layer['lastweek_worked_hours'] = last_week_hours
     layer['last_year_worked_hours'] = last_year_hours
 
     return layer
+
+
+def add_mean_weekday_last_10(layer):
+    layer_DateTimeIndex = pd.DatetimeIndex(layer['date'])
+    layer['weekday'] = layer_DateTimeIndex.weekday
+    layer = layer.groupby('weekday').apply(custom_mean_10)
+    layer = layer.drop('weekday', axis=1)
+
+    return layer
+
+
+def custom_mean_10(grp):
+    # Retrieve the mean worked time on the last 10 mean weakdays
+
+    list_mean = list()
+
+    mean_all = grp['hours'].mean()
+
+    for index, row in enumerate(grp.iterrows()):
+        total = datetime.timedelta(0)
+        if index > 10:
+            for x in range(10):
+                hours = grp.iloc[index-x]['hours']
+                total = total + hours
+
+            mean = total/10
+        else:
+            mean = mean_all
+
+        list_mean.append(round(mean.total_seconds()/3600,2))
+
+    grp['last_10_weekdays'] = list_mean
+
+    return grp
 
 
 def add_mean_weekday_lastyear(layer):
@@ -350,11 +386,52 @@ def missplanned(layer_name):
 
     total = 0
     counter = 0
+    over_planned = 0
+    under_planned = 0
 
     for index, filename in enumerate(os.listdir(path_planned)):
 
         data_planned = pd.read_csv(path_planned + filename, sep=';')
+
         layer = filename.split("PLANNED")[1]
+
+        data_worked = pd.read_csv(path_worked + layer, sep=';')
+
+        over_planned = 0
+        under_planned = 0
+
+        for row in data_planned.iterrows():
+            date_planned = row[1]['date']
+            hours_planned = row[1]['hours']
+            hours_worked = data_worked[data_worked['date'] == date_planned]['hours']
+            hours_worked = hours_worked.tolist()[0]
+            hours_wrong = hours_planned-hours_worked
+
+            if hours_wrong > 0:
+                over_planned += 1
+            else:
+                under_planned += 1
+
+            total = abs(hours_wrong) + total
+            counter += 1
+
+        print('Days over-planned for ' + layer + ' = ' + str(over_planned))
+        print('Days under-planned for ' + layer + ' = '+ str(under_planned))
+
+    mean = total/counter
+
+    print('Days over-planned for ' + filename + ' ' + str(over_planned))
+    print('Days under-planned for ' + filename + ' '+ str(under_planned))
+
+    counter = 0
+    total = 0
+
+    for index, filename in enumerate(os.listdir(path_planned)):
+
+        data_planned = pd.read_csv(path_planned + filename, sep=';')
+
+        layer = filename.split("PLANNED")[1]
+
         data_worked = pd.read_csv(path_worked + layer, sep=';')
 
         for row in data_planned.iterrows():
@@ -364,9 +441,10 @@ def missplanned(layer_name):
             hours_worked = hours_worked.tolist()[0]
             hours_wrong = abs(hours_planned-hours_worked)
 
-            total = hours_wrong + total
+            total = total + abs(hours_wrong - mean)
             counter += 1
 
-    print('The planner for ' + layer_name + ' missplanned an average of ' + str(total/counter) + ' hours per day.')
+    standarddev = total/counter
 
-fetch_data()
+    print('The planner for ' + layer_name + ' missplanned an average of ' + str(mean) + ' hours per day.')    
+    print('Standard deviation: ' + str(standarddev))
