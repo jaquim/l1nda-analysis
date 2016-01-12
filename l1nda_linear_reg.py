@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
+from scipy.stats import pearsonr
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 import l1nda
-from scipy.stats import pearsonr
+
 
 company_37_branch_141 = l1nda.fetch_data()
 
@@ -46,12 +46,7 @@ def create_linear_models(data_dict):
     for type_schedule, schedule in data_dict.items():
         print(type_schedule)
         for data_frame in schedule.values():
-            x = pd.DataFrame(data_frame['data'])
-            y = pd.DataFrame(data_frame['y_vector'])
-            print(x, y)
-            est = sm.OLS(y, x).fit()
-            print(est.summary())
-
+            break
 
 compute_layer_correlation(company_37_branch_141)
 # create_linear_models(company_37_branch_141)
