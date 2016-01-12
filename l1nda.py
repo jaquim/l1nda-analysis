@@ -59,7 +59,10 @@ features = list()
 layers = list()
 
 # option to write layers to csv
-write_to_csv = False
+write_to_csv = True
+
+# for smaller test sets:
+filter_2015 = True
 
 
 def fetch_data():
@@ -103,11 +106,17 @@ def fetch_data():
 
 def transform_data(data_frame, output_path):
 
+    global filter_2015
+
     start = pd.to_datetime(data_frame['start'])
     end = pd.to_datetime(data_frame['end'])
     # transform date, start, and end columns entries from
     # database csv dump into datetimeobjects
     data_frame['date'] = start.dt.strftime('%Y-%m-%d')
+
+    if filter_2015 is True:
+        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
+
     data_frame['start'] = start.dt.strftime('%H:%M:%S')
     data_frame['end'] = end.dt.strftime('%H:%M:%S')
     # calculate the time delta, resulting in the actual worked hours
@@ -361,3 +370,5 @@ def missplanned(layer_name):
             counter += 1
 
     print('The planner for ' + layer_name + ' missplanned an average of ' + str(total/counter) + ' hours per day.')
+
+fetch_data()
