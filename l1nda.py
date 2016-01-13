@@ -51,7 +51,7 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # input file
-file_name = 'COMPANY_25_BRANCH_81'
+file_name = 'COMPANY_59_BRANCH_362'
 
 # features to be extracted
 features = list()
@@ -59,10 +59,10 @@ features = list()
 layers = list()
 
 # option to write layers to csv
-write_to_csv = False
+write_to_csv = True
 
 # for smaller test sets:
-filter_2015 = False
+filter_2015 = True
 
 
 def fetch_data():
