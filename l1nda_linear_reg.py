@@ -53,5 +53,5 @@ def create_linear_models(data_dict):
             est = sm.OLS(y, X).fit()
             print(est.summary())
 
-compute_layer_correlation(numpy)
-create_linear_models(pandas)
+# compute_layer_correlation(numpy)
+# create_linear_models(pandas)

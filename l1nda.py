@@ -6,7 +6,7 @@ import pandas as pd
 import warnings
 import os
 import shutil
-# from progress.bar import Bar
+from progress.bar import Bar
 from datetime import date, timedelta
 import datetime
 
@@ -50,7 +50,7 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # Input file
-file_name = 'COMPANY_59_BRANCH_362'
+file_name = './datadump/l1nda_full'
 
 # Features to be extracted
 features = list()
@@ -61,46 +61,48 @@ layers = list()
 write_to_csv = True
 
 # For smaller test sets:
-filter_2015 = True
+filter_2015 = False
 
 
 def fetch_data():
-    print(file_name + ':\n')
+    global file_name
 
-    # Create directory for the data to be placed in
-    datadump_dir = './datadump/' + file_name
+    data = pd.read_csv(file_name + '.csv')
 
-    if write_to_csv is True:
-        # Check if datadump_dir exists, if so, remove
-        if os.path.exists(datadump_dir):
-            shutil.rmtree(datadump_dir)
-        os.mkdir('./datadump/' + file_name)
+    grouped = data.groupby(['domain', 'branch'])
 
-    # Read in data file and create datadump_dir named according file_name
-    input_path = './datadump/' + file_name + '.csv'
+    for name, data in grouped:
+        file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
 
-    # Instantiate pandas dataframe
-    data = pd.read_csv(input_path)
+        # Create directory for the data to be placed in
+        datadump_dir = './datadump/' + file_name
 
-    # Retrieve from file planned working hours schedule
-    data_planned = data[data['is_last_planned'] == 't']
-    # Retrieve actual worked hours, based on either 'is_deleted'
-    # Boolean is set to true, or forward_id is equal to the
-    # Id of the scheme itself. This can only occur if the  'is_last_planned'
-    # Boolean is set true
-    data_worked = data[(data['is_deleted'] == 'f') | (data['is_deleted'] == 't') \
-                & (data['forward_id'] == data['event_version_id'])]
+        if write_to_csv is True:
+            # Check if datadump_dir exists, if so, remove
+            if os.path.exists(datadump_dir):
+                shutil.rmtree(datadump_dir)
+            os.mkdir('./datadump/' + file_name)
 
-    data_worked = transform_data(data_worked, 'WORKED')
-    data_planned = transform_data(data_planned, 'PLANNED')
+        # Retrieve from file planned working hours schedule
+        data_planned = data[data['is_last_planned'] == 't']
+        # Retrieve actual worked hours, based on either 'is_deleted'
+        # Boolean is set to true, or forward_id is equal to the
+        # Id of the scheme itself. This can only occur if the  'is_last_planned'
+        # Boolean is set true
+        data_worked = data[(data['is_deleted'] == 'f') | (data['is_deleted'] == 't') \
+                    & (data['forward_id'] == data['event_version_id'])]
 
-    company_data = {'WORKED': data_worked,
-                    'PLANNED': data_planned}
+        data_worked = transform_data(data_worked, 'WORKED')
+        data_planned = transform_data(data_planned, 'PLANNED')
 
-    print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
-          % (features, len(layers), layers))
+        company_data = {'WORKED': data_worked,
+                        'PLANNED': data_planned}
 
-    return company_data
+        print(file_name + '\n')
+        print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
+              % (features, len(layers), layers))
+
+    print('Done!')
 
 
 # Calculate the actual hours per shift, which we will use to calculate
@@ -137,10 +139,10 @@ def fetch_layers(data_frame, output_path):
 
     layers = [name for name, _ in grouped]
 
-#    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
-#              max=len(grouped),
-#              fill='-',
-#              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
+    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
+             max=len(grouped),
+             fill='-',
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
     layer_dict = dict()
     for name, group in grouped:
@@ -169,8 +171,8 @@ def fetch_layers(data_frame, output_path):
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
         layer_dict[name] = layer
 
-#        bar.next()
-#    bar.finish()
+        bar.next()
+    bar.finish()
     return layer_dict
 
 
@@ -469,4 +471,4 @@ def missplanned(layer_name):
     print('The planner for ' + layer_name + ' missplanned an average of ' + str(mean) + ' hours per day.')
     print('Standard deviation: ' + str(standarddev))
 
-# fetch_data()
+fetch_data()
