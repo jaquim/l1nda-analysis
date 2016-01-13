@@ -6,7 +6,7 @@ import pandas as pd
 import warnings
 import os
 import shutil
-# from progress.bar import Bar
+from progress.bar import Bar
 from datetime import date, timedelta
 import datetime
 
@@ -50,7 +50,7 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # Input file
-file_name = 'COMPANY_59_BRANCH_362'
+file_name = 'COMPANY_25_BRANCH_81'
 
 # Features to be extracted
 features = list()
@@ -137,10 +137,10 @@ def fetch_layers(data_frame, output_path):
 
     layers = [name for name, _ in grouped]
 
-#    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
-#              max=len(grouped),
-#              fill='-',
-#              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
+    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
+             max=len(grouped),
+             fill='-',
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
     layer_dict = dict()
     for name, group in grouped:
@@ -169,8 +169,8 @@ def fetch_layers(data_frame, output_path):
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
         layer_dict[name] = layer
 
-#        bar.next()
-#    bar.finish()
+        bar.next()
+    bar.finish()
     return layer_dict
 
 
