@@ -51,7 +51,7 @@ weather_file = 'datadump_weercijfer.csv'
 festivity_file = 'datadump_feestdagen.csv'
 
 # input file
-file_name = 'COMPANY_59_BRANCH_362'
+file_name = 'COMPANY_37_BRANCH_139'
 
 # features to be extracted
 features = list()
@@ -59,10 +59,10 @@ features = list()
 layers = list()
 
 # option to write layers to csv
-write_to_csv = True
+write_to_csv = False
 
 # for smaller test sets:
-filter_2015 = True
+filter_2015 = False
 
 
 def fetch_data():
@@ -95,13 +95,16 @@ def fetch_data():
     data_worked = transform_data(data_worked, 'WORKED')
     data_planned = transform_data(data_planned, 'PLANNED')
 
-    company_data = {'WORKED': data_worked,
-                    'PLANNED': data_planned}
+    numpy_company_data = {'WORKED': return_numpy_transform(data_worked),
+                          'PLANNED': return_numpy_transform(data_planned)}
+
+    pandas_company_data = {'WORKED': data_worked,
+                           'PLANNED': data_planned}
 
     print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
           % (features, len(layers), layers))
 
-    return company_data
+    return numpy_company_data, pandas_company_data
 
 
 def transform_data(data_frame, output_path):
@@ -358,7 +361,8 @@ def add_festivities(data_frame):
 
 
 # read in data set from the features file.
-def return_data_object(data_dict):
+# and output into numpy format
+def return_numpy_transform(data_dict):
     for layer_name, data_frame in data_dict.items():
         # initialize X matrix, and Y vector
         X, Y = list(), list()

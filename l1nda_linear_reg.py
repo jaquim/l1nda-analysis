@@ -7,7 +7,7 @@ import l1nda
 import statsmodels.api as sm
 
 
-company_37_branch_141 = l1nda.fetch_data()
+numpy, pandas = l1nda.fetch_data()
 
 company_affiliate_name = l1nda.file_name
 features = l1nda.features
@@ -26,6 +26,7 @@ def compute_layer_correlation(data_dict):
     for type_schedule, schedule in data_dict.items():
         layer_amount = len(schedule.items())
         summed_correlation_vector = np.zeros(shape=(1, feature_amount))
+        print(feature_amount, summed_correlation_vector)
         print(type_schedule + ' schedule:')
         for layer_name, data_frame in schedule.items():
             layer_correlation = compute_correlation(data_frame['data'],
@@ -45,12 +46,12 @@ def compute_layer_correlation(data_dict):
 
 def create_linear_models(data_dict):
     for type_schedule, schedule in data_dict.items():
-        if type_schedule == 'WORKED':
-            for layer_name, data_frame in schedule.items():
-                X = data_frame[features]
-                y = data_frame['hours']
-                est = sm.OLS(y, X).fit()
-                print(est.summary())
+        print(type_schedule)
+        for data_frame in schedule.values():
+            X = data_frame['data']
+            y = data_frame['y_frame']
+            est = sm.OLS(y, X).fit()
+            print(est.summary())
 
-# compute_layer_correlation(company_37_branch_141)
-create_linear_models(company_37_branch_141)
+compute_layer_correlation(numpy)
+create_linear_models(pandas)
