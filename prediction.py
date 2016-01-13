@@ -1,9 +1,12 @@
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
+import l1nda
 
-layer = 'layer1069'
-company_branch = 'COMPANY_59_BRANCH_362'
+data = l1nda.fetch_data()
+
+company_branch = l1nda.file_name
+layers = l1nda.layers
 
 
 def read_data_log_reg(file_name, sep):
@@ -61,9 +64,9 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
 
-
-data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + '.csv', sep=';')
-data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + '.csv', sep=';')
-prediction_list, hours_list, planned_list, date_list= calc_pred_2(np.matrix(data_worked), np.matrix(data_planned))
-save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
-save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+for layer in layers:
+    data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + '.csv', sep=';')
+    data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + '.csv', sep=';')
+    prediction_list, hours_list, planned_list, date_list= calc_pred_2(np.matrix(data_worked), np.matrix(data_planned))
+    save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+    save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
