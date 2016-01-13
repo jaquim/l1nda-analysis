@@ -9,6 +9,14 @@ company_branch = l1nda.file_name
 layers = l1nda.layers
 
 
+coef_festivity = 11.6234
+coef_weather_grades = 0
+coef_last_10_weekdays = 0.2034
+cef_mean_weekday_lastyear = 0
+coef_last_week_worked_hours = 0.4719
+coef_last_year_worked_hours = 0
+coef_lastnumber = 5.094
+
 def read_data_log_reg(file_name, sep):
     data = pandas.read_csv(file_name, sep=sep)
     return data
@@ -27,7 +35,9 @@ def calc_pred_2(data_worked, data_planned):
                 # np.ravel(element_worked)[5] = last_week_worked_hours
                 # np.ravel(element_worked)[6] = last_year_worked_hours
                 ##########
-                prediction = 11.6234 * np.ravel(element_worked)[1] + 0.2034 * np.ravel(element_worked)[3] + 0.4719 * np.ravel(element_worked)[5] + 5.094
+                prediction = coef_festivity * np.ravel(element_worked)[1] + coef_weather_grades * np.ravel(element_worked)[2] + coef_last_10_weekdays * np.ravel(element_worked)[3] \
+                 + cef_mean_weekday_lastyear * np.ravel(element_worked)[4] + coef_last_week_worked_hours * np.ravel(element_worked)[5]\
+                  + coef_last_year_worked_hours * np.ravel(element_worked)[6] +  coef_lastnumber
                 prediction_list.append(prediction)
                 hours_list.append(np.ravel(element_worked)[6])
                 planned_list.append(np.ravel(element_planned)[6])
@@ -45,6 +55,7 @@ def save_results_real(prediction_list, hours_list, planned_list, date_list, file
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
+    plt.clf()
 
 def save_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
     diff_prediction = np.array(hours_list) - np.array(prediction_list)
@@ -53,7 +64,7 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     # print diff_prediction
     diff_planner = np.array(hours_list) - np.array(planned_list)
     plt.figure(1)
-    plt.ylabel('Hours')
+    plt.ylabel('Difference in hours')
     plt.xlabel('Date in days')
     plt.title('Difference between planner/predicter and the worked hours')
     plt.plot(diff_prediction, label='prediction')
@@ -63,6 +74,7 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
+    plt.clf()
 
 for layer in layers:
     data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + '.csv', sep=';')
