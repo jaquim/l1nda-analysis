@@ -12,35 +12,24 @@ layers = l1nda.layers
 coef_festivity = 11.6234
 coef_weather_grades = 0
 coef_last_10_weekdays = 0.2034
-cef_mean_weekday_lastyear = 0
-coef_last_week_worked_hours = 0.4719
+coef_mean_weekday_lastyear = 0
+coef_lastweek_worked_hours = 0.4719
 coef_last_year_worked_hours = 0
 coef_lastnumber = 5.094
 
-def read_data_log_reg(file_name, sep):
-    data = pandas.read_csv(file_name, sep=sep)
-    return data
+def read_data(data, layer, flag):
+    return data[flag][layer]
 
-def calc_pred_2(data_worked, data_planned):
+def calc_pred(data_worked, data_planned):
     prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
-    for element_planned in data_planned:
-        for element_worked in data_worked:
-            if np.ravel(element_planned)[0] == np.ravel(element_worked)[0]:
+    for element_planned in data_planned.iterrows():
+        for element_worked in data_worked.iterrows():
+            if element_planned[1]['date'] == element_worked[1]['date']:
                 date_list.append(np.ravel(element_planned)[0])
-                ##########
-                # np.ravel(element_worked)[1] = festivity
-                # np.ravel(element_worked)[2] = weather_grades
-                # np.ravel(element_worked)[3] = last_10_weekdays
-                # np.ravel(element_worked)[4] = mean_weekday_lastyear
-                # np.ravel(element_worked)[5] = last_week_worked_hours
-                # np.ravel(element_worked)[6] = last_year_worked_hours
-                ##########
-                prediction = coef_festivity * np.ravel(element_worked)[1] + coef_weather_grades * np.ravel(element_worked)[2] + coef_last_10_weekdays * np.ravel(element_worked)[3] \
-                 + cef_mean_weekday_lastyear * np.ravel(element_worked)[4] + coef_last_week_worked_hours * np.ravel(element_worked)[5]\
-                  + coef_last_year_worked_hours * np.ravel(element_worked)[6] +  coef_lastnumber
+                prediction = coef_festivity * element_planned[1]['festivity'] + coef_weather_grades * element_planned[1]['weather_grades'] + coef_last_10_weekdays * element_planned[1]['last_10_weekdays'] + coef_mean_weekday_lastyear * element_planned[1]['mean_weekday_lastyear'] + coef_lastweek_worked_hours * element_planned[1]['lastweek_worked_hours'] + coef_last_year_worked_hours * element_planned[1]['last_year_worked_hours'] + coef_lastnumber
                 prediction_list.append(prediction)
-                hours_list.append(np.ravel(element_worked)[6])
-                planned_list.append(np.ravel(element_planned)[6])
+                hours_list.append(element_worked[1]['hours'])
+                planned_list.append(element_planned[1]['hours'])
     return prediction_list, hours_list, planned_list, date_list
 
 def save_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
@@ -77,8 +66,9 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.clf()
 
 for layer in layers:
-    data_worked = read_data_log_reg('datadump/'+ company_branch + '/WORKED/'+ company_branch + '_WORKED_' + layer + '.csv', sep=';')
-    data_planned = read_data_log_reg('datadump/' + company_branch + '/PLANNED/' + company_branch +'_PLANNED_' + layer + '.csv', sep=';')
-    prediction_list, hours_list, planned_list, date_list= calc_pred_2(np.matrix(data_worked), np.matrix(data_planned))
+    data_worked = read_data(data, layer, 'WORKED')
+    data_planned = read_data(data, layer, 'PLANNED')
+    prediction_list, hours_list, planned_list, date_list= calc_pred(data_worked, data_planned)
     save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
     save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+    
