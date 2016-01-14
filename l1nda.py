@@ -179,7 +179,7 @@ def fetch_layers(data_frame, output_path):
         if write_to_csv is True:
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
 
-        branch_dict[name] = layer.tojson()
+        branch_dict[name] = layer.to_json()
 
     with open(('%s/%s_%s.json') % (output_dir, file_name, output_path), 'w') as outfile:
             json.dump(branch_dict, outfile, indent=4)
