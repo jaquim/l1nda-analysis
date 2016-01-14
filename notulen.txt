@@ -88,8 +88,19 @@ Dinsdag 12-01-2016
 
 	nan correlaties?
 
-	Resultaten van meerdere fillialen plotten met Weka. Script om de correlation per layer en per filiaal te krijgen. Dit om de wensen van L1nda tegemoet te komen om goed voorspellende features te vinden. Besloten om nog te wachten wat we moeten doen met de nullen die bij sommige features te voorschijn komen. Hier vragen we Eva en/of Maarten over. Python implementatie van de regressie werkend te krijgen om iets anders dan Weka te hebben. Feature gemaakt voor gemiddelde gewerkte uren van de zelfde weekdag per afgelopen 10 weken. De resultaten van de nieuwe feature lijken dichtbij een reeds bestaande te liggen. De overweging moet gemaakt worden of we deze toe willen voegen of niet. 
+	Resultaten van meerdere fillialen plotten met Weka. Script om de correlation per layer en per filiaal te krijgen. Dit om de wensen van L1nda tegemoet te komen om goed voorspellende features te vinden. Besloten om nog te wachten wat we moeten doen met de nullen die bij sommige features te voorschijn komen. Hier vragen we Eva en/of Maarten over. Python implementatie van de regressie werkend te krijgen om iets anders dan Weka te hebben. Feature gemaakt voor gemiddelde gewerkte uren van de zelfde weekdag per afgelopen 10 weken. De resultaten van de nieuwe feature lijken dichtbij een reeds bestaande te liggen. De overweging moet gemaakt worden of we deze toe willen voegen of niet.
 
+Woensdag 13-1-2016
+
+	Code op gehele database
+
+	Vandaag de code zo omgeschreven dat deze niet meer handmatig per filiaal aangevraagd hoeft te worden, maar dat de code runt op de gehele database file en zelf hier de data berekent per filiaal. Door de grote van de database dump duurt dit 45 min tot twee uur. Dit hoeft wel maar 1 keer gedaan te worden, daarna kunnen de leeragoritmes op de losse filialen aan het werk.
+
+Donderdag 14-1-2016 
+
+	Error company_61_branch_366
+
+	Na de code te hebben gerund op de gehele database file waren er problemen met twee branches. Hier konden op de een of andere manier de gewerkte uren niet worden berekend. De end-start geeft een type error, alsof je een timestamp van een nul-object aftrekt. Nog niet achter gekomen wat hiervan de oorzaak is. Tijdelijke oplossing is deze twee bedrijven even niet mee te nemen in onze data.
 ---------------------------------------------------------
 
 Resultaten:
