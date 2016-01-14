@@ -70,42 +70,50 @@ def fetch_data():
     data = pd.read_csv(file_name + '.csv')
 
     grouped = data.groupby(['domain', 'branch'])
+    try:
 
-    bar = Bar(('Composing layers by computing features for %s schedule: '),
+        bar = Bar(('Composing layers by computing features'),
              max=len(grouped),
              fill='-',
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
-    for name, data in grouped:
-        file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
+        for name, data in grouped:
+            if name[0] != (61 or 68):
+                file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
+                print('\n' + file_name + '\n')
 
-        # Create directory for the data to be placed in
-        datadump_dir = './datadump/' + file_name
+                # Create directory for the data to be placed in
+                datadump_dir = './datadump/' + file_name
 
-        if write_to_csv is True:
-            # Check if datadump_dir exists, if so, remove
-            if os.path.exists(datadump_dir):
-                shutil.rmtree(datadump_dir)
-            os.mkdir('./datadump/' + file_name)
+                if write_to_csv is True:
+                    # Check if datadump_dir exists, if so, remove
+                    if os.path.exists(datadump_dir):
+                        shutil.rmtree(datadump_dir)
+                    os.mkdir('./datadump/' + file_name)
 
-        # Retrieve from file planned working hours schedule
-        data_planned = data[data['is_last_planned'] == 't']
-        # Retrieve actual worked hours, based on either 'is_deleted'
-        # Boolean is set to true, or forward_id is equal to the
-        # Id of the scheme itself. This can only occur if the  'is_last_planned'
-        # Boolean is set true
-        data_worked = data[(data['is_deleted'] == 'f') | (data['is_deleted'] == 't') \
-                    & (data['forward_id'] == data['event_version_id'])]
+                # Retrieve from file planned working hours schedule
+                data_planned = data[data['is_last_planned'] == 't']
+                # Retrieve actual worked hours, based on either 'is_deleted'
+                # Boolean is set to true, or forward_id is equal to the
+                # Id of the scheme itself. This can only occur if the  'is_last_planned'
+                # Boolean is set true
+                data_worked = data[(data['is_deleted'] == 'f') | (data['is_deleted'] == 't') \
+                            & (data['forward_id'] == data['event_version_id'])]
 
-        data_worked = transform_data(data_worked, 'WORKED')
-        data_planned = transform_data(data_planned, 'PLANNED')
+                data_worked = transform_data(data_worked, 'WORKED')
+                data_planned = transform_data(data_planned, 'PLANNED')
 
-        company_data = {'WORKED': data_worked,
-                        'PLANNED': data_planned}
+                company_data = {'WORKED': data_worked,
+                                'PLANNED': data_planned}
 
-        print(file_name + '\n')
-        print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
-              % (features, len(layers), layers))
+                print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
+                      % (features, len(layers), layers))
+
+            bar.next()
+        bar.finish()
+    except Exception as e:
+        print(e)
+        pass
 
         bar.next()
     bar.finish()
@@ -147,9 +155,8 @@ def fetch_layers(data_frame, output_path):
 
     layers = [name for name, _ in grouped]
 
-    
+    branch_dict = dict()
 
-    layer_dict = dict()
     for name, group in grouped:
 
         # Calculate the hours per date
@@ -174,9 +181,10 @@ def fetch_layers(data_frame, output_path):
             layer = layer[(layer['date'] > '2014-12-31')]
         if write_to_csv is True:
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
-        layer_dict[name] = layer
+        branch_dict[name] = layer
 
-    return layer_dict
+    return branch_dict
+
 
 
 # Orders the features, so that total hours worked/planned is the last column
