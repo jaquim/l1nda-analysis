@@ -59,14 +59,15 @@ features = list()
 layers = list()
 
 # Option to write layers to csv
-write_to_csv = True
-
+write_to_csv = False
+# Option to write layers to JSON
+write_to_json = True
 # For smaller test sets:
 filter_2015 = False
 
 
 def fetch_data():
-    global file_name
+    global file_name, write_to_json
 
     data = pd.read_csv(file_name + '.csv')
 
@@ -79,18 +80,17 @@ def fetch_data():
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
         for name, data in grouped:
-            if name[0] != (61 or 68):
+            if (name[0] != 61) and (name[0] != 68):
                 file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
-                print('\n' + file_name + '\n')
-
-                # Create directory for the data to be placed in
-                datadump_dir = './datadump/' + file_name
+                print('\n\n' + file_name + ':')
 
                 if write_to_csv is True:
+                    # Create directory for the data to be placed in
+                    datadump_dir = './datadump/' + file_name
                     # Check if datadump_dir exists, if so, remove
                     if os.path.exists(datadump_dir):
                         shutil.rmtree(datadump_dir)
-                    os.mkdir('./datadump/' + file_name)
+                    os.mkdir(datadump_dir)
 
                 # Retrieve from file planned working hours schedule
                 data_planned = data[data['is_last_planned'] == 't']
@@ -107,8 +107,15 @@ def fetch_data():
                 company_data = {'WORKED': data_worked,
                                 'PLANNED': data_planned}
 
-                print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
+                print('Present features: \n%s\nPresent layers (%s):\n%s\n'
                       % (features, len(layers), layers))
+
+                output_dir = './datadump/json/'
+                if not os.path.exists(output_dir):
+                        os.mkdir(output_dir)
+                if write_to_json is True:
+                    with open(('%s/%s.json') % (output_dir, file_name), 'w') as outfile:
+                            json.dump(company_data, outfile, indent=4)
 
             bar.next()
         bar.finish()
@@ -121,7 +128,7 @@ def fetch_data():
 
 # Calculate the actual hours per shift, which we will use to calculate
 # the amount of hours per day
-def transform_data(data_frame, output_path):
+def transform_data(data_frame, schedule_type):
 
     global filter_2015
 
@@ -135,16 +142,16 @@ def transform_data(data_frame, output_path):
     # Calculate the time delta, resulting in the actual worked hours
     data_frame['hours'] = (end-start)
 
-    return fetch_layers(data_frame, output_path)
+    return fetch_layers(data_frame, schedule_type)
 
 
 # Calculate the total amount of hours per day and add all the different
 # features
-def fetch_layers(data_frame, output_path):
+def fetch_layers(data_frame, schedule_type):
 
     global layers
 
-    output_dir = './datadump/' + file_name + '/' + output_path
+    output_dir = './datadump/' + file_name + '/' + schedule_type
 
     if write_to_csv is True:
         os.mkdir(output_dir)
@@ -177,12 +184,9 @@ def fetch_layers(data_frame, output_path):
         if filter_2015 is True:
             layer = layer[(layer['date'] > '2014-12-31')]
         if write_to_csv is True:
-            layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
+            layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, schedule_type, name), sep=',', index=False)
 
         branch_dict[name] = layer.to_json()
-
-    with open(('%s/%s_%s.json') % (output_dir, file_name, output_path), 'w') as outfile:
-            json.dump(branch_dict, outfile, indent=4)
 
     return branch_dict
 
