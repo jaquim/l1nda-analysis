@@ -79,7 +79,7 @@ def fetch_data():
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
         for name, data in grouped:
-            if name[0] != (61 or 68):
+            if name[0] > 68:
                 file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
                 print('\n' + file_name + '\n')
 
@@ -189,7 +189,6 @@ def fetch_layers(data_frame, output_path):
             json.dump(branch_dict, outfile, indent=4)
 
     return branch_dict
-
 
 
 # Orders the features, so that total hours worked/planned is the last column
