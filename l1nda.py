@@ -9,6 +9,7 @@ import shutil
 from progress.bar import Bar
 from datetime import date, timedelta
 import datetime
+import json
 
 _author_ = "Simon Hoekman, Wout Kooijman, Max Mijnheer, Jaquim Cadogan"
 
@@ -177,7 +178,11 @@ def fetch_layers(data_frame, output_path):
             layer = layer[(layer['date'] > '2014-12-31')]
         if write_to_csv is True:
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
-        branch_dict[name] = layer
+
+        branch_dict[name] = layer.tojson()
+
+    with open(('%s/%s_%s.json') % (output_dir, file_name, output_path), 'w') as outfile:
+            json.dump(branch_dict, outfile, indent=4)
 
     return branch_dict
 
