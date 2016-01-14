@@ -71,6 +71,11 @@ def fetch_data():
 
     grouped = data.groupby(['domain', 'branch'])
 
+    bar = Bar(('Composing layers by computing features for %s schedule: '),
+             max=len(grouped),
+             fill='-',
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
+
     for name, data in grouped:
         file_name = 'COMPANY_' + str(name[0]) + '_BRANCH_' + str(name[1])
 
@@ -101,6 +106,9 @@ def fetch_data():
         print(file_name + '\n')
         print('\nPresent features: \n%s\nPresent layers (%s):\n%s\n'
               % (features, len(layers), layers))
+
+        bar.next()
+    bar.finish()
 
     print('Done!')
 
@@ -139,10 +147,7 @@ def fetch_layers(data_frame, output_path):
 
     layers = [name for name, _ in grouped]
 
-    bar = Bar(('Composing layers by computing features for %s schedule: ') % output_path,
-             max=len(grouped),
-             fill='-',
-             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
+    
 
     layer_dict = dict()
     for name, group in grouped:
@@ -171,8 +176,6 @@ def fetch_layers(data_frame, output_path):
             layer.to_csv(('%s/%s_%s_%s.csv') % (output_dir, file_name, output_path, name), sep=',', index=False)
         layer_dict[name] = layer
 
-        bar.next()
-    bar.finish()
     return layer_dict
 
 
