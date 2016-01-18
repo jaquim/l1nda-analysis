@@ -42,20 +42,22 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
         print('Mean correlation for %s:\n %s\n' % (company_affiliate_name, annotated_correlation))
 
 
+# Compute some info on the perfomance of the planner and our model
 def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
     prediction_list, worked_list, planned_list, date_list = prediction.calc_pred(data_worked, data_planned, coef_list)
 
     # Prediction
-
     total_pred = 0
     counter = 0
     over_planned_pred = 0
     under_planned_pred = 0
 
+    # Calculate the amount of missplanned hours and the mean missplanned hours
     for pred, worked in zip(prediction_list, worked_list):
         hours_wrong = pred-worked
 
+        # Count the times of overplanning/underplanning
         if hours_wrong > 0:
             over_planned_pred += 1
         else:
@@ -69,6 +71,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     total = 0
     counter = 0
 
+    # Calculate the standarddeviation 
     for pred, worked in zip(prediction_list, worked_list):
         hours_wrong = abs(pred-worked)
         total = total + abs(hours_wrong - mean_pred)
@@ -77,14 +80,16 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     std_pred = total/counter
 
     # Planned
-
     total_planned = 0
     counter = 0
     over_planned_planner = 0
     under_planned_planner = 0
+
+    # Calculate the amount of missplanned hours and the mean missplanned hours
     for planned, worked in zip(planned_list, worked_list):
         hours_wrong = planned-worked
 
+        # Count the times of overplanning/underplanning
         if hours_wrong > 0:
             over_planned_planner += 1
         else:
@@ -98,6 +103,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     total = 0
     counter = 0
 
+    # Calculate the standarddeviation 
     for planned, worked in zip(planned_list, worked_list):
         hours_wrong = abs(planned-worked)
         total = total + abs(hours_wrong - mean_planner)
@@ -109,6 +115,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
     info = pd.DataFrame(index=range(1))
 
+    # Add the info to a dataframe and write that to csv, for future use
     info['mean_missplanned_planner'] = mean_planner
     info['mean_missplanned_prediction'] = mean_pred
     info['std_planner'] = std_planned
@@ -121,6 +128,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     info['percentage'] = percentage
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
 
+    # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
 
     layer_name = info_dir + '_overview.csv'
@@ -129,13 +137,28 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
 
 def create_linear_models():
+    # input directory for JSON data
     json_dir = './datadump/json/'
+    # output directory for overall statistics
     results_dir = './datadump/results/'
-    total_frame = pd.DataFrame()
+    # pandas dataframe with total results
+    total_frame = pd.DataFrame(columns=['mean_missplanned_planner',
+                                        'mean_missplanned_prediction',
+                                        'std_planner',
+                                        'std_prediction',
+                                        'over_planned_planner',
+                                        'under_planned_planner',
+                                        'over_planned_pred',
+                                        'under_planned_pred',
+                                        'percentage',
+                                        'most_predicting_feature'])
+
+    # creation  of output directory
     if os.path.exists(results_dir):
                 shutil.rmtree(results_dir)
     os.mkdir(results_dir)
 
+    # iterate through input JSON directory to apply learning algorithm
     for json_file in os.listdir(json_dir):
         print(json_file)
         info_dir = os.path.join(results_dir, os.path.splitext(json_file)[0])
@@ -147,21 +170,33 @@ def create_linear_models():
             json_data = json.load(data)
 
             for schedule_type, schedule in json_data.items():
+                # apply learning algorithm only to WORKED dataset
                 if schedule_type == 'WORKED':
+                    # for an indication where the iteration process is
                     print(len(schedule.items()))
                     for layer, data_frame in schedule.items():
+                        # for an indication where the iteration process is
                         print(layer)
+                        # transform data_frame from pandas to json, back to pandas frame
                         json_data[schedule_type][layer] = pd.read_json(data_frame)
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
-
+                        # filter only on 2015 data
                         data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
-
+                        # check if there is
+                        if data_frame.empty:
+                            continue
+                        # create the dataset by excluding the date and hours
                         X = data_frame.ix[:, data_frame.columns.difference(exclude)]
+                        # instantiate y vector
                         y = data_frame['hours']
-                        est = sm.OLS(y, X).fit()
+                        # create/compute/fit a multivariate linear regression model
+                        # no iteration is used, but the statsmodels is
+                        # vector based multiplication-wise implemented
+                        linear_model = sm.OLS(y, X).fit()
 
-                        coef_list = zip(est.params.index.tolist(), est.params.tolist())
+                        # coeficients/ parametersoutputed by the linear regression model
+                        coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
 
                         data_planned = pd.read_json(json_data['PLANNED'][layer])
 
@@ -170,9 +205,10 @@ def create_linear_models():
                         if not os.path.exists(layer_name):
                             os.mkdir(layer_name)
 
+                        # compute plots
                         prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+                        # compute overall statistics
                         info(data_planned, data_frame, layer_name + layer, coef_list, total_frame)
-                        print(total_frame.describe())
 
-    print(total_frame.describe())
+            # print(total_frame.describe())
 create_linear_models()
