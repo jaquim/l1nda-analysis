@@ -1,25 +1,15 @@
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
-import l1nda
 
-
-def read_data(data, layer, flag):
-    return data[flag][layer]
 
 def calc_pred(data_worked, data_planned, coef_list):
     prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
-    print data_worked
-    print '~~~~~ ~~~~'
-    print data_planned
-    print '-----'
     for element_planned in data_planned.iterrows():
         for element_worked in data_worked.iterrows():
             if element_planned[1]['date'] == element_worked[1]['date']:
-                print element_planned[1]['festivity']
-                print element_worked
                 date_list.append(np.ravel(element_planned)[0])
-                prediction = coef_list[0][1] * element_planned[1]['festivity'] + coef_list[1][1] * element_planned[1]['weather_grades'] + coef_list[2][1] * element_planned[1]['last_10_weekdays'] + coef_list[3][1] * element_planned[1]['mean_weekday_lastyear'] + coef_list[4][1] * element_planned[1]['lastweek_worked_hours'] + coef_list[5][1] * element_planned[1]['last_year_worked_hours']
+                prediction = coef_list[0][1] * element_planned[1]['festivity'] + coef_list[5][1] * element_planned[1]['weather_grades'] + coef_list[1][1] * element_planned[1]['last_10_weekdays'] + coef_list[4][1] * element_planned[1]['mean_weekday_lastyear'] + coef_list[3][1] * element_planned[1]['lastweek_worked_hours'] + coef_list[2][1] * element_planned[1]['last_year_worked_hours']
                 prediction_list.append(prediction)
                 hours_list.append(element_worked[1]['hours'])
                 planned_list.append(element_planned[1]['hours'])
@@ -58,3 +48,7 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
     plt.clf()
 
+def predict(data_frame, data_planned, coef_list, output_path):
+    prediction_list, hours_list, planned_list, date_list = calc_pred(data_frame, data_planned, coef_list)
+    save_results_real(prediction_list, hours_list, planned_list, date_list, output_path)
+    save_results_difference(prediction_list, hours_list, planned_list, date_list, output_path)
