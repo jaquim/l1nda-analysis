@@ -59,9 +59,9 @@ features = list()
 layers = list()
 
 # Option to write layers to csv
-write_to_csv = False
+write_to_csv = True
 # Option to write layers to JSON
-write_to_json = True
+write_to_json = False
 # For smaller test sets:
 filter_2015 = False
 
@@ -74,7 +74,13 @@ def fetch_data():
     grouped = data.groupby(['domain', 'branch'])
     try:
 
-        bar = Bar(('Composing layers by computing features'),
+        if write_to_json is True:
+            output_dir = './datadump/json/'
+            if os.path.exists(output_dir):
+                shutil.rmtree(output_dir)
+            os.mkdir(output_dir)
+
+        bar = Bar(('Composing layers by computing features:'),
              max=len(grouped),
              fill='-',
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
@@ -110,9 +116,6 @@ def fetch_data():
                 print('Present features: \n%s\nPresent layers (%s):\n%s\n'
                       % (features, len(layers), layers))
 
-                output_dir = './datadump/json/'
-                if not os.path.exists(output_dir):
-                        os.mkdir(output_dir)
                 if write_to_json is True:
                     with open(('%s/%s.json') % (output_dir, file_name), 'w') as outfile:
                             json.dump(company_data, outfile, indent=4)
