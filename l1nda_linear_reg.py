@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import l1nda
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import prediction
 import os
 import json
 
@@ -50,15 +52,28 @@ def create_linear_models():
     for json_file in os.listdir(json_dir):
         with open(os.path.join(json_dir, json_file)) as data:
             json_data = json.load(data)
+            print json_file
             for schedule_type, schedule in json_data.items():
                 if schedule_type == 'WORKED':
                     for layer, data_frame in schedule.items():
                         # json_data[schedule_type][layer] = pd.read_json(data_frame)
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
+                        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
                         X = data_frame.ix[:, data_frame.columns.difference(exclude)]
                         y = data_frame['hours']
+
+                        print layer
                         est = sm.OLS(y, X).fit()
-                        print(zip(est.params.index.tolist(), est.params.tolist()))
+                        coef_list = (zip(est.params.index.tolist(), est.params.tolist()))
+                        data_planned = pd.read_json(json_data['PLANNED'][layer])
+                        company_branch = os.path.splitext(json_file)[0]
+                        prediction_list, hours_list, planned_list, date_list = prediction.calc_pred(data_frame, data_planned, coef_list)
+                        prediction.save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+                        prediction.save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
+                        break
+                    break
+                break
+            break
 
 create_linear_models()
