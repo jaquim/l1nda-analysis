@@ -7,12 +7,8 @@ import l1nda
 import prediction
 import statsmodels.api as sm
 import os
+import shutil
 import json
-
-# numpy, pandas = l1nda.fetch_data()
-
-# company_affiliate_name = l1nda.file_name
-# features = l1nda.features
 
 
 # Compute the correlation for two numpy arrays
@@ -45,7 +41,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
         print('Mean correlation for %s:\n %s\n' % (company_affiliate_name, annotated_correlation))
 
 
-def info(coef_list, data_planned, data_worked, layer_name):
+def info(coef_list, data_planned, data_worked, info_dir):
 
     prediction_list, worked_list, planned_list, date_list = prediction.calc_pred(coef_list, data_worked, data_planned)
 
@@ -124,18 +120,26 @@ def info(coef_list, data_planned, data_worked, layer_name):
     info['percentage'] = percentage
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])
 
-    layer_name = layer_name + '_info'
+    layer_name = info_dir + '_info'
 
     info.to_csv(layer_name, sep=',', index=False)
 
 
 def create_linear_models():
     json_dir = './datadump/json/'
+    results_dir = './datadump/results/'
+    if os.path.exists(results_dir):
+                shutil.rmtree(results_dir)
+    os.mkdir(results_dir)
 
     for json_file in os.listdir(json_dir):
-        info_dir = os.path.join(json_dir, os.path.splitext(json_file)[0])
+
+        info_dir = os.path.join(results_dir, os.path.splitext(json_file)[0])
+        if os.path.exists(info_dir):
+                shutil.rmtree(info_dir)
+        os.mkdir(info_dir)
+
         with open(os.path.join(json_dir, json_file)) as data:
-            print(json_file)
             json_data = json.load(data)
             for schedule_type, schedule in json_data.items():
                 if schedule_type == 'WORKED':
@@ -148,11 +152,14 @@ def create_linear_models():
                         est = sm.OLS(y, X).fit()
 
                         coef_list = zip(est.params.index.tolist(), est.params.tolist())
-                        data_planned = pd.read_json(json_data['PLANNED'][layer])
 
+                        data_planned = pd.read_json(json_data['PLANNED'][layer])
+                        layer_name = info_dir + '/' + layer
+                        print(layer_name)
                         # info(coef_list, data_planned, data_frame, layer_name)
                         break
                     break
+                break
             break
-        break
+
 create_linear_models()
