@@ -126,6 +126,9 @@ def fetch_data():
         print(e)
         pass
 
+        bar.next()
+    bar.finish()
+
     print('Done!')
 
 
@@ -164,6 +167,7 @@ def fetch_layers(data_frame, schedule_type):
     layers = [name for name, _ in grouped]
 
     branch_dict = dict()
+
     for name, group in grouped:
 
         # Calculate the hours per date

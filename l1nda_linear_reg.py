@@ -6,6 +6,7 @@ import pandas as pd
 import l1nda
 import prediction
 import statsmodels.api as sm
+import prediction
 import os
 import shutil
 import json
@@ -141,12 +142,14 @@ def create_linear_models():
 
         with open(os.path.join(json_dir, json_file)) as data:
             json_data = json.load(data)
+
             for schedule_type, schedule in json_data.items():
                 if schedule_type == 'WORKED':
                     for layer, data_frame in schedule.items():
                         json_data[schedule_type][layer] = pd.read_json(data_frame)
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
+                        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
                         X = data_frame.ix[:, data_frame.columns.difference(exclude)]
                         y = data_frame['hours']
                         est = sm.OLS(y, X).fit()
@@ -154,12 +157,13 @@ def create_linear_models():
                         coef_list = zip(est.params.index.tolist(), est.params.tolist())
 
                         data_planned = pd.read_json(json_data['PLANNED'][layer])
+
                         layer_name = info_dir + '/' + layer
-                        print(layer_name)
-                        # info(coef_list, data_planned, data_frame, layer_name)
+
+                        prediction.predict(data_frame, data_planned, coef_list, layer_name)
+                        info(coef_list, data_planned, data_frame, layer_name)
                         break
                     break
                 break
             break
-
 create_linear_models()
