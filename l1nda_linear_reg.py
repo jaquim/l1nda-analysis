@@ -26,7 +26,6 @@ def compute_layer_correlation(data_dict):
     for type_schedule, schedule in data_dict.items():
         layer_amount = len(schedule.items())
         summed_correlation_vector = np.zeros(shape=(1, feature_amount))
-        print(feature_amount, summed_correlation_vector)
         print(type_schedule + ' schedule:')
         for layer_name, data_frame in schedule.items():
             layer_correlation = compute_correlation(data_frame['data'],
