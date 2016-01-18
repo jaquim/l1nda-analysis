@@ -1,4 +1,3 @@
-import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,12 +17,12 @@ def calc_pred(data_worked, data_planned, coef_list):
 def save_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
     plt.figure(0)
     plt.ylabel('Hours')
-    plt.xlabel('Date in days')
+    plt.xlabel('Date in days').set_visible(False)
     plt.title('Worked hours versus planned and predicted hours')
     plt.plot(planned_list, label='planner')
     plt.plot(prediction_list, label='prediction')
     plt.plot(hours_list, label='real hours')
-    plt.xticks(range(len(date_list)), date_list)
+    plt.xticks(range(len(date_list)), [])
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
@@ -37,12 +36,12 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     diff_planner = np.array(hours_list) - np.array(planned_list)
     plt.figure(1)
     plt.ylabel('Difference in hours')
-    plt.xlabel('Date in days')
+    plt.xlabel('Date in days').set_visible(False)
     plt.title('Difference between planner/predicter and the worked hours')
     plt.plot(diff_prediction, label='prediction')
     plt.axhline(0)
     plt.plot(diff_planner, label='planner')
-    plt.xticks(range(len(date_list)), date_list)
+    plt.xticks(range(len(date_list)), [])
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
