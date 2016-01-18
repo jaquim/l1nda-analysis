@@ -4,6 +4,7 @@ from scipy.stats import pearsonr
 import numpy as np
 import pandas as pd
 import l1nda
+import prediction
 import statsmodels.api as sm
 import os
 import json
@@ -44,21 +45,114 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
         print('Mean correlation for %s:\n %s\n' % (company_affiliate_name, annotated_correlation))
 
 
+def info(coef_list, data_planned, data_worked, layer_name):
+
+    prediction_list, worked_list, planned_list, date_list = prediction.calc_pred(coef_list, data_worked, data_planned)
+
+    # Prediction
+
+    total_pred = 0
+    counter = 0
+    over_planned_pred = 0
+    under_planned_pred = 0
+
+    for pred, worked in zip(prediction_list, worked_list):
+        hours_wrong = pred-worked
+
+        if hours_wrong > 0:
+            over_planned_pred += 1
+        else:
+            under_planned_pred += 1
+
+        total_pred = abs(hours_wrong) + total_pred
+        counter += 1
+
+    mean_pred = total_pred/counter
+
+    total = 0
+    counter = 0
+
+    for pred, worked in zip(prediction_list, worked_list):
+        hours_wrong = abs(pred-worked)
+        total = total + abs(hours_wrong - mean_pred)
+        counter += 1
+
+    std_pred = total/counter
+
+    # Planned
+
+    total_planned = 0
+    counter = 0
+    over_planned_planner = 0
+    under_planned_planner = 0
+    for planned, worked in zip(prediction_list, worked_list):
+        hours_wrong = planned-worked
+
+        if hours_wrong > 0:
+            over_planned_planner += 1
+        else:
+            under_planned_planner += 1
+
+        total_planned = abs(hours_wrong) + total_planned
+        counter += 1
+
+    mean_planner = total_planned/counter
+
+    total = 0
+    counter = 0
+
+    for planned, worked in zip(prediction_list, worked_list):
+        hours_wrong = abs(planned-worked)
+        total = total + abs(hours_wrong - mean_planner)
+        counter += 1
+
+    std_planned = total/counter
+
+    percentage = total_pred/total_planned * 100
+
+    info = pd.dataFrame()
+
+    info['mean_missplanned_planner'] = mean_planner
+    info['mean_missplanned_prediction'] = mean_pred
+    info['std_planner'] = std_planned
+    info['std_prediction'] = std_pred
+    info['over_planned_planner'] = over_planned_planner
+    info['under_planned_planner'] = under_planned_planner
+    info['over_planned_pred'] = over_planned_pred
+    info['under_planned_pred'] = under_planned_pred
+    info['coef_list'] = coef_list
+    info['percentage'] = percentage
+    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])
+
+    layer_name = layer_name + '_info'
+
+    info.to_csv(layer_name, sep=',', index=False)
+
+
 def create_linear_models():
     json_dir = './datadump/json/'
 
     for json_file in os.listdir(json_dir):
+        info_dir = os.path.join(json_dir, os.path.splitext(json_file)[0])
         with open(os.path.join(json_dir, json_file)) as data:
+            print(json_file)
             json_data = json.load(data)
             for schedule_type, schedule in json_data.items():
                 if schedule_type == 'WORKED':
                     for layer, data_frame in schedule.items():
-                        # json_data[schedule_type][layer] = pd.read_json(data_frame)
+                        json_data[schedule_type][layer] = pd.read_json(data_frame)
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
                         X = data_frame.ix[:, data_frame.columns.difference(exclude)]
                         y = data_frame['hours']
                         est = sm.OLS(y, X).fit()
-                        print(zip(est.params.index.tolist(), est.params.tolist()))
 
+                        coef_list = zip(est.params.index.tolist(), est.params.tolist())
+                        data_planned = pd.read_json(json_data['PLANNED'][layer])
+
+                        # info(coef_list, data_planned, data_frame, layer_name)
+                        break
+                    break
+            break
+        break
 create_linear_models()

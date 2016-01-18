@@ -3,12 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import l1nda
 
-data = l1nda.fetch_data()
-
-company_branch = l1nda.file_name
-layers = l1nda.layers
-
-
 coef_festivity = 11.6234
 coef_weather_grades = 0
 coef_last_10_weekdays = 0.2034
@@ -17,8 +11,10 @@ coef_lastweek_worked_hours = 0.4719
 coef_last_year_worked_hours = 0
 coef_lastnumber = 5.094
 
+
 def read_data(data, layer, flag):
     return data[flag][layer]
+
 
 def calc_pred(data_worked, data_planned):
     prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
@@ -31,6 +27,7 @@ def calc_pred(data_worked, data_planned):
                 hours_list.append(element_worked[1]['hours'])
                 planned_list.append(element_planned[1]['hours'])
     return prediction_list, hours_list, planned_list, date_list
+
 
 def save_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
     plt.figure(0)
@@ -45,6 +42,7 @@ def save_results_real(prediction_list, hours_list, planned_list, date_list, file
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
     plt.clf()
+
 
 def save_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
     diff_prediction = np.array(hours_list) - np.array(prediction_list)
@@ -64,11 +62,3 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
           ncol=3, fancybox=True, shadow=True)
     plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
     plt.clf()
-
-for layer in layers:
-    data_worked = read_data(data, layer, 'WORKED')
-    data_planned = read_data(data, layer, 'PLANNED')
-    prediction_list, hours_list, planned_list, date_list= calc_pred(data_worked, data_planned)
-    save_results_real(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
-    save_results_difference(prediction_list, hours_list, planned_list, date_list, company_branch + '_PLANNED_' + layer)
-    
