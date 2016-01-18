@@ -488,5 +488,3 @@ def missplanned(layer_name):
 
     print('The planner for ' + layer_name + ' missplanned an average of ' + str(mean) + ' hours per day.')
     print('Standard deviation: ' + str(standarddev))
-
-fetch_data()
