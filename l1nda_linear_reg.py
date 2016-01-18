@@ -172,6 +172,7 @@ def create_linear_models():
 
                         prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
                         info(data_planned, data_frame, layer_name + layer, coef_list, total_frame)
-    print(total_frame)
+                        print(total_frame.describe())
+
     print(total_frame.describe())
 create_linear_models()
