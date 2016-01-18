@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def calc_pred(data_worked, data_planned, coef_list):
+
     prediction_list, hours_list, planned_list, date_list = list(), list(), list(), list()
     for element_planned in data_planned.iterrows():
         for element_worked in data_worked.iterrows():
@@ -14,7 +15,8 @@ def calc_pred(data_worked, data_planned, coef_list):
                 planned_list.append(element_planned[1]['hours'])
     return prediction_list, hours_list, planned_list, date_list
 
-def save_results_real(prediction_list, hours_list, planned_list, date_list, file_name):
+
+def save_results_real(prediction_list, hours_list, planned_list, date_list, output_path):
     plt.figure(0)
     plt.ylabel('Hours')
     plt.xlabel('Date in days').set_visible(False)
@@ -25,14 +27,12 @@ def save_results_real(prediction_list, hours_list, planned_list, date_list, file
     plt.xticks(range(len(date_list)), [])
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
-    plt.savefig('./../L1nda_plots/' + file_name + '_hours.png')
+    plt.savefig(output_path + '_hours.png')
     plt.clf()
 
-def save_results_difference(prediction_list, hours_list, planned_list, date_list, file_name):
+
+def save_results_difference(prediction_list, hours_list, planned_list, date_list, output_path):
     diff_prediction = np.array(hours_list) - np.array(prediction_list)
-    # print np.array(hours_list)
-    # print np.array(prediction_list)
-    # print diff_prediction
     diff_planner = np.array(hours_list) - np.array(planned_list)
     plt.figure(1)
     plt.ylabel('Difference in hours')
@@ -44,8 +44,9 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     plt.xticks(range(len(date_list)), [])
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.03),
           ncol=3, fancybox=True, shadow=True)
-    plt.savefig('./../L1nda_plots/' + file_name + '_difference.png')
+    plt.savefig(output_path + '_difference.png')
     plt.clf()
+
 
 def predict(data_frame, data_planned, coef_list, output_path):
     prediction_list, hours_list, planned_list, date_list = calc_pred(data_frame, data_planned, coef_list)
