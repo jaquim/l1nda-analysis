@@ -188,7 +188,7 @@ def create_linear_models():
                         # create/compute/fit a multivariate linear regression model
                         # no iteration is used, but the statsmodels is
                         # vector based multiplication-wise implemented
-                        linear_model = sm.LinearRegression().fit(X,y)
+                        linear_model = sm.OLS(y, X).fit()
 
                         # coeficients/ parametersoutputed by the linear regression model
 
