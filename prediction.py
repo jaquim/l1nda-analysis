@@ -22,9 +22,10 @@ def calc_pred(data_worked, data_planned, coef_list):
                 prediction_list.append(prediction)
                 hours_list.append(element_worked[1]['hours'])
                 planned_list.append(element_planned[1]['hours'])
-    prediction_model = str(coef_list[0][1]) + ' * X_festivity + ' + str(coef_list[5][1]) + ' * X_weathergrades + ' + str(coef_list[1][1]) + ' * X_last_10_weekdays + ' + str(coef_list[4][1]) + ' * X_mean_weekday_lastyear + ' + str(coef_list[3][1]) + ' * X_last_week_workedhours + ' + str(coef_list[2][1]) + ' * X_last_year_workedhours'
-    print prediction_model
-    return prediction_list, hours_list, planned_list, date_list, prediction_model
+    #prediction_model = str(coef_list[0][1]) + ' * X_festivity + ' + str(coef_list[5][1]) + ' * X_weathergrades + ' + str(coef_list[1][1]) + ' * X_last_10_weekdays + ' + str(coef_list[4][1]) + ' * X_mean_weekday_lastyear + ' + str(coef_list[3][1]) + ' * X_last_week_workedhours + ' + str(coef_list[2][1]) + ' * X_last_year_workedhours'
+    #print prediction_model
+    print coef_list
+    return prediction_list, hours_list, planned_list, date_list #, prediction_model
 
 
 # Plots the results of the predicted hours against the real worked hours
@@ -80,6 +81,6 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
 
 # The main function to calculate the predictions and save the plots
 def predict(data_frame, data_planned, coef_list, output_path):
-    prediction_list, hours_list, planned_list, date_list, nothing = calc_pred(data_frame, data_planned, coef_list)
+    prediction_list, hours_list, planned_list, date_list = calc_pred(data_frame, data_planned, coef_list)
     save_results_real(prediction_list, hours_list, planned_list, date_list, output_path)
     save_results_difference(prediction_list, hours_list, planned_list, date_list, output_path)

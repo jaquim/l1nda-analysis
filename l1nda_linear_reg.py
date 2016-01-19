@@ -104,7 +104,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     total = 0
     counter = 0
 
-    # Calculate the standarddeviation 
+    # Calculate the standarddeviation
     for planned, worked in zip(planned_list, worked_list):
         hours_wrong = abs(planned-worked)
         total = total + abs(hours_wrong - mean_planner)
@@ -127,7 +127,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     info['under_planned_pred'] = under_planned_pred
     # info['coef_list'] = coef_list
     info['percentage'] = percentage
-    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+#    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
@@ -183,7 +183,7 @@ def create_linear_models():
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
                         # filter only on 2015 data
-                        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
+                        data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
                         # check if there is
                         if data_frame.empty:
                             continue
@@ -194,7 +194,7 @@ def create_linear_models():
                         # create/compute/fit a multivariate linear regression model
                         # no iteration is used, but the statsmodels is
                         # vector based multiplication-wise implemented
-                        linear_model = sm.Linear_Regression().fit(X,y)
+                        linear_model = sm.LinearRegression().fit(X,y)
 
                         # coeficients/ parametersoutputed by the linear regression model
                         #coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
