@@ -94,7 +94,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     std_pred = total_pred/counter
     std_planned = total_planned/counter
 
-    performance_ratio = (1 - total_pred/total_planned) + 1
+    performance_ratio = total_planned/total_pred
 
     info = pd.DataFrame(index=range(1))
 
