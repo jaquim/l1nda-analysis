@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 from scipy.stats import pearsonr
+from progress.bar import Bar
 import numpy as np
 import pandas as pd
 import l1nda
 import prediction
 import statsmodels.api as sm
-import prediction
 import os
 import shutil
 import json
@@ -45,71 +45,55 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 # Compute some info on the perfomance of the planner and our model
 def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
-    prediction_list, worked_list, planned_list, date_list, coef_model = prediction.calc_pred(data_worked, data_planned, coef_list)
+    prediction_list, worked_list, planned_list, date_list, model = prediction.calc_pred(data_worked, data_planned, coef_list)
 
-    # Prediction
-    total_pred = 0
     counter = 0
+
+    total_pred = 0
     over_planned_pred = 0
     under_planned_pred = 0
 
-    # Calculate the amount of missplanned hours and the mean missplanned hours
-    for pred, worked in zip(prediction_list, worked_list):
-        hours_wrong = pred-worked
-
-        # Count the times of overplanning/underplanning
-        if hours_wrong > 0:
-            over_planned_pred += 1
-        else:
-            under_planned_pred += 1
-
-        total_pred = abs(hours_wrong) + total_pred
-        counter += 1
-
-    mean_pred = total_pred/counter
-
-    total = 0
-    counter = 0
-
-    # Calculate the standarddeviation 
-    for pred, worked in zip(prediction_list, worked_list):
-        hours_wrong = abs(pred-worked)
-        total = total + abs(hours_wrong - mean_pred)
-        counter += 1
-
-    std_pred = total/counter
-
-    # Planned
     total_planned = 0
-    counter = 0
     over_planned_planner = 0
     under_planned_planner = 0
 
     # Calculate the amount of missplanned hours and the mean missplanned hours
-    for planned, worked in zip(planned_list, worked_list):
-        hours_wrong = planned-worked
+    for pred, worked, planned in zip(prediction_list, worked_list, planned_list):
+        hours_wrong_pred = pred-worked
+        hours_wrong_plan = planned-worked
 
         # Count the times of overplanning/underplanning
-        if hours_wrong > 0:
+        if hours_wrong_pred > 0:
+            over_planned_pred += 1
+        else:
+            under_planned_pred += 1
+
+        if hours_wrong_plan > 0:
             over_planned_planner += 1
         else:
             under_planned_planner += 1
 
-        total_planned = abs(hours_wrong) + total_planned
+        total_pred = abs(hours_wrong_pred) + total_pred
+        total_planned = abs(hours_wrong_plan) + total_planned
         counter += 1
 
+    mean_pred = total_pred/counter
     mean_planner = total_planned/counter
 
-    total = 0
+    total_pred = 0
+    total_planned = 0
     counter = 0
 
-    # Calculate the standarddeviation 
-    for planned, worked in zip(planned_list, worked_list):
-        hours_wrong = abs(planned-worked)
-        total = total + abs(hours_wrong - mean_planner)
+    # Calculate the standarddeviation
+    for pred, worked, planned in zip(prediction_list, worked_list, planned_list):
+        hours_wrong_pred = abs(pred-worked)
+        hours_wrong_plan = abs(planned-worked)
+        total_pred = total_pred + abs(hours_wrong_pred - mean_pred)
+        total_planned = total_planned + abs(hours_wrong_plan - mean_pred)
         counter += 1
 
-    std_planned = total/counter
+    std_pred = total_pred/counter
+    std_planned = total_planned/counter
 
     percentage = total_pred/total_planned * 100
 
@@ -135,6 +119,8 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
     info.to_csv(layer_name, sep=',', index=False)
 
+    return total_frame
+
 
 def create_linear_models():
     # input directory for JSON data
@@ -157,6 +143,11 @@ def create_linear_models():
     if os.path.exists(results_dir):
                 shutil.rmtree(results_dir)
     os.mkdir(results_dir)
+
+    bar = Bar(('Appliying regression and examine statistics:'),
+             max=len(os.listdir(json_dir)),
+             fill='-',
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
 
     # iterate through input JSON directory to apply learning algorithm
     for json_file in os.listdir(json_dir):
@@ -182,7 +173,7 @@ def create_linear_models():
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
                         # filter only on 2015 data
-                        data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
+                        # data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
                         # check if there is
                         if data_frame.empty:
                             continue
@@ -197,7 +188,6 @@ def create_linear_models():
 
                         # coeficients/ parametersoutputed by the linear regression model
                         coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
-
                         data_planned = pd.read_json(json_data['PLANNED'][layer])
 
                         layer_name = info_dir + '/' + layer + '/'
@@ -208,7 +198,13 @@ def create_linear_models():
                         # compute plots
                         prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
                         # compute overall statistics
-                        info(data_planned, data_frame, layer_name + layer, coef_list, total_frame)
+                        total_frame = info(data_planned, data_frame, layer_name + layer, coef_list, total_frame)
+            print(total_frame.describe())
+            bar.next()
 
-            # print(total_frame.describe())
+    overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
+    total_frame.describe().to_csv(results_dir + '_TOTAL_OVERVIEW', sep=',', index=False)
+    bar.finish()
+
+    # print(total_frame.describe())
 create_linear_models()
