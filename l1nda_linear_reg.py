@@ -46,7 +46,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 # Compute some info on the perfomance of the planner and our model
 def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
-    prediction_list, worked_list, planned_list, date_list = prediction.calc_pred(data_worked, data_planned, coef_list)
+    prediction_list, worked_list, planned_list, date_list, coef_model = prediction.calc_pred(data_worked, data_planned, coef_list)
 
     # Prediction
     total_pred = 0
@@ -127,7 +127,7 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     info['under_planned_pred'] = under_planned_pred
     # info['coef_list'] = coef_list
     info['percentage'] = percentage
-#    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
