@@ -126,9 +126,6 @@ def fetch_data():
         print(e)
         pass
 
-        bar.next()
-    bar.finish()
-
     print('Done!')
 
 
