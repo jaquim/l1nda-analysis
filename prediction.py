@@ -84,4 +84,4 @@ def predict(data_frame, data_planned, coef_list, output_path):
     save_results_real(prediction_list, hours_list, planned_list, date_list, output_path)
     save_results_difference(prediction_list, hours_list, planned_list, date_list, output_path)
 
-    return prediction_list, hours_list, planned_list, date_list, coef_model
+    return prediction_list, hours_list, planned_list, date_list, coef_list, coef_model

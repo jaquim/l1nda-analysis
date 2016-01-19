@@ -42,7 +42,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 
 
 # Compute some info on the perfomance of the planner and our model
-def info(prediction_list, worked_list, planned_list, layer_name, model, total_frame):
+def info(prediction_list, worked_list, planned_list, layer_name, coef_list, total_frame):
 
     counter = 0
 
@@ -112,7 +112,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, model, total_fr
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
 
-    layer_name = info_dir + '_overview.csv'
+    layer_name = layer_name + '_overview.csv'
 
     info.to_csv(layer_name, sep=',', index=False)
 
@@ -193,9 +193,9 @@ def create_linear_models():
                             os.mkdir(layer_name)
 
                         # compute plots
-                        prediction_list, worked_list, planned_list, _, model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+                        prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
                         # compute overall statistics
-                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, model, total_frame)
+                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, total_frame)
             print(total_frame.describe())
             bar.next()
 
