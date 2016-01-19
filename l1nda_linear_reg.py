@@ -45,7 +45,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 # Compute some info on the perfomance of the planner and our model
 def info(data_planned, data_worked, info_dir, coef_list, total_frame):
 
-    prediction_list, worked_list, planned_list, date_list = prediction.calc_pred(data_worked, data_planned, coef_list)
+    prediction_list, worked_list, planned_list, date_list, coef_model = prediction.calc_pred(data_worked, data_planned, coef_list)
 
     # Prediction
     total_pred = 0
