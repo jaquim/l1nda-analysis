@@ -42,7 +42,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 
 
 # Compute some info on the perfomance of the planner and our model
-def info(prediction_list, worked_list, planned_list, layer_name, coef_list, total_frame):
+def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef_model, total_frame):
 
     counter = 0
 
@@ -94,7 +94,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, tota
     std_pred = total_pred/counter
     std_planned = total_planned/counter
 
-    performance_ratio = 1 - total_pred/total_planned
+    performance_ratio = (1 - total_pred/total_planned) + 1
 
     info = pd.DataFrame(index=range(1))
 
@@ -110,6 +110,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, tota
     # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+    info['model'] = coef_model
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
@@ -201,7 +202,7 @@ def create_linear_models():
                         # compute plots
                         prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
                         # compute overall statistics
-                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, total_frame)
+                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
             print(total_frame.describe())
             bar.next()
 
