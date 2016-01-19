@@ -4,7 +4,6 @@ from scipy.stats import pearsonr
 from progress.bar import Bar
 import numpy as np
 import pandas as pd
-import l1nda
 import prediction
 import statsmodels.api as sm
 import os
@@ -43,9 +42,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 
 
 # Compute some info on the perfomance of the planner and our model
-def info(data_planned, data_worked, info_dir, coef_list, total_frame):
-
-    prediction_list, worked_list, planned_list, date_list, model = prediction.calc_pred(data_worked, data_planned, coef_list)
+def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef_model, total_frame):
 
     counter = 0
 
@@ -85,17 +82,19 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     counter = 0
 
     # Calculate the standarddeviation
+
     for pred, worked, planned in zip(prediction_list, worked_list, planned_list):
         hours_wrong_pred = abs(pred-worked)
         hours_wrong_plan = abs(planned-worked)
         total_pred = total_pred + abs(hours_wrong_pred - mean_pred)
         total_planned = total_planned + abs(hours_wrong_plan - mean_pred)
+
         counter += 1
 
     std_pred = total_pred/counter
     std_planned = total_planned/counter
 
-    percentage = total_pred/total_planned * 100
+    performance_ratio = total_planned/total_pred
 
     info = pd.DataFrame(index=range(1))
 
@@ -109,13 +108,14 @@ def info(data_planned, data_worked, info_dir, coef_list, total_frame):
     info['over_planned_pred'] = over_planned_pred
     info['under_planned_pred'] = under_planned_pred
     # info['coef_list'] = coef_list
-    info['percentage'] = percentage
+    info['performance_ratio'] = performance_ratio
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+    info['model'] = coef_model
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
 
-    layer_name = info_dir + '_overview.csv'
+    layer_name = layer_name + '_overview.csv'
 
     info.to_csv(layer_name, sep=',', index=False)
 
@@ -173,7 +173,9 @@ def create_linear_models():
                         exclude = ['date', 'hours']
                         data_frame = pd.read_json(data_frame)
                         # filter only on 2015 data
+
                         # data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
+
                         # check if there is
                         if data_frame.empty:
                             continue
@@ -187,7 +189,9 @@ def create_linear_models():
                         linear_model = sm.OLS(y, X).fit()
 
                         # coeficients/ parametersoutputed by the linear regression model
+
                         coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+
                         data_planned = pd.read_json(json_data['PLANNED'][layer])
 
                         layer_name = info_dir + '/' + layer + '/'
@@ -196,9 +200,9 @@ def create_linear_models():
                             os.mkdir(layer_name)
 
                         # compute plots
-                        prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+                        prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
                         # compute overall statistics
-                        total_frame = info(data_planned, data_frame, layer_name + layer, coef_list, total_frame)
+                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
             print(total_frame.describe())
             bar.next()
 
