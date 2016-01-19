@@ -80,6 +80,8 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
 
 # The main function to calculate the predictions and save the plots
 def predict(data_frame, data_planned, coef_list, output_path):
-    prediction_list, hours_list, planned_list, date_list, _ = calc_pred(data_frame, data_planned, coef_list)
+    prediction_list, hours_list, planned_list, date_list, coef_model = calc_pred(data_frame, data_planned, coef_list)
     save_results_real(prediction_list, hours_list, planned_list, date_list, output_path)
     save_results_difference(prediction_list, hours_list, planned_list, date_list, output_path)
+
+    return prediction_list, hours_list, planned_list, date_list, coef_model
