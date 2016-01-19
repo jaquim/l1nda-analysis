@@ -16,7 +16,7 @@ def calc_pred(data_worked, data_planned, coef_list):
             if element_planned[1]['date'] == element_worked[1]['date']:
                 date_list.append(np.ravel(element_planned)[0])
                 # Create the predicted hours based on the coeficients returned by the linear regression model
-                prediction = coef_list[0][1] * element_planned[1]['festivity'] + coef_list[5][1] * element_planned[1]['weather_grades'] + coef_list[1][1] * element_planned[1]['last_10_weekdays'] + coef_list[4][1] * element_planned[1]['mean_weekday_lastyear'] + coef_list[3][1] * element_planned[1]['lastweek_worked_hours'] + coef_list[2][1] * element_planned[1]['last_year_worked_hours']
+                prediction = coef_list[0] * element_planned[1]['festivity'] + coef_list[5] * element_planned[1]['weather_grades'] + coef_list[1] * element_planned[1]['last_10_weekdays'] + coef_list[4] * element_planned[1]['mean_weekday_lastyear'] + coef_list[3] * element_planned[1]['lastweek_worked_hours'] + coef_list[2] * element_planned[1]['last_year_worked_hours']
                 # Append the predicted hours, worked hours and planned hours
                 # to the lists to be returned
                 prediction_list.append(prediction)

@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import l1nda
 import prediction
-import statsmodels.api as sm
+from sklearn import linear_model as sm
+#import statsmodels.api as sm
 import prediction
 import os
 import shutil
@@ -193,10 +194,11 @@ def create_linear_models():
                         # create/compute/fit a multivariate linear regression model
                         # no iteration is used, but the statsmodels is
                         # vector based multiplication-wise implemented
-                        linear_model = sm.OLS(y, X).fit()
+                        linear_model = sm.Linear_Regression().fit(X,y)
 
                         # coeficients/ parametersoutputed by the linear regression model
-                        coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+                        #coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+                        coef_list = list(linear_model.coef_)
 
                         data_planned = pd.read_json(json_data['PLANNED'][layer])
 
