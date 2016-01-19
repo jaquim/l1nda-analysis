@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import matplotlib
-matplotlib.use('GTKAgg')
+matplotlib.use('Agg')
 from scipy.stats import pearsonr
 from progress.bar import Bar
 import numpy as np
