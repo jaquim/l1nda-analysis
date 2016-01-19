@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
 # Calculates the prediction based on the coeficients of the model
 # returns a list with a prediction each day, the real hours each day
 # and the planned hours each day, it also returns a list with each days date
@@ -50,6 +49,7 @@ def save_results_real(prediction_list, hours_list, planned_list, date_list, outp
     # otherwise the next plot will still have the previous plot in it
     plt.clf()
 
+
 # Plots the difference of the predicted hours against the planned worked hours
 # and saves this in a folder. It does so by evaluating how much one was wrong
 # in terms of how much difference there was between the real worked hourss
@@ -77,6 +77,7 @@ def save_results_difference(prediction_list, hours_list, planned_list, date_list
     # Clear the plot,
     # otherwise the next plot will still have the previous plot in it
     plt.clf()
+
 
 # The main function to calculate the predictions and save the plots
 def predict(data_frame, data_planned, coef_list, output_path):
