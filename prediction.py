@@ -15,13 +15,13 @@ def calc_pred(data_worked, data_planned, coef_list):
             if element_planned[1]['date'] == element_worked[1]['date']:
                 date_list.append(np.ravel(element_planned)[0])
                 # Create the predicted hours based on the coeficients returned by the linear regression model
-                prediction = coef_list[0][1] * element_planned[1]['festivity'] + coef_list[5][1] * element_planned[1]['weather_grades'] + coef_list[1][1] * element_planned[1]['last_10_weekdays'] + coef_list[4][1] * element_planned[1]['mean_weekday_lastyear'] + coef_list[3][1] * element_planned[1]['lastweek_worked_hours'] + coef_list[2][1] * element_planned[1]['last_year_worked_hours'] + coef_list[6][1] * element_planned[1]['theta_vector']
+                prediction = coef_list[0][1] * element_planned[1]['festivity'] + coef_list[5][1] * element_planned[1]['weather_grades'] + coef_list[1][1] * element_planned[1]['last_10_weekdays'] + coef_list[4][1] * element_planned[1]['mean_weekday_lastyear'] + coef_list[3][1] * element_planned[1]['lastweek_worked_hours'] + coef_list[2][1] * element_planned[1]['last_year_worked_hours']
                 # Append the predicted hours, worked hours and planned hours
                 # to the lists to be returned
                 prediction_list.append(prediction)
                 hours_list.append(element_worked[1]['hours'])
                 planned_list.append(element_planned[1]['hours'])
-    prediction_model = str(coef_list[0][1]) + ' * X_festivity + ' + str(coef_list[5][1]) + ' * X_weathergrades + ' + str(coef_list[1][1]) + ' * X_last_10_weekdays + ' + str(coef_list[4][1]) + ' * X_mean_weekday_lastyear + ' + str(coef_list[3][1]) + ' * X_last_week_workedhours + ' + str(coef_list[2][1]) + ' * X_last_year_workedhours' + str(coef_list[6][1]) + ' * X_Theta'
+    prediction_model = str(coef_list[0][1]) + ' * X_festivity + ' + str(coef_list[5][1]) + ' * X_weathergrades + ' + str(coef_list[1][1]) + ' * X_last_10_weekdays + ' + str(coef_list[4][1]) + ' * X_mean_weekday_lastyear + ' + str(coef_list[3][1]) + ' * X_last_week_workedhours + ' + str(coef_list[2][1]) + ' * X_last_year_workedhours'
     return prediction_list, hours_list, planned_list, date_list, prediction_model
 
 
