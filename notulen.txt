@@ -257,3 +257,124 @@ Kurtosis:                      21.785   Cond. No.                     1.26e+03
 ==============================================================================
 
  ***********************************************************************************************************************
+
+ Amount of companies present in dataset: 20
+	Current company (#1): COMPANY_34_BRANCH_115
+		Amount of layers present in COMPANY_34_BRANCH_115: 1
+			Current layer (#1): layer398
+				Appliying regression and examine statistics: |                                | 0.4% - Time remaining: 6361s - Time elapsed: 24s
+	Current company (#2): COMPANY_34_BRANCH_116
+		Amount of layers present in COMPANY_34_BRANCH_116: 1
+			Current layer (#1): layer372
+				Appliying regression and examine statistics: |                                | 0.8% - Time remaining: 3653s - Time elapsed: 27s
+	Current company (#3): COMPANY_34_BRANCH_118
+		Amount of layers present in COMPANY_34_BRANCH_118: 4
+			Current layer (#1): layer386
+				Appliying regression and examine statistics: |                                | 1.1% - Time remaining: 3419s - Time elapsed: 38s
+			Current layer (#2): layer387
+				Appliying regression and examine statistics: |                                | 1.5% - Time remaining: 2573s - Time elapsed: 39s
+			Current layer (#3): layer380
+				Appliying regression and examine statistics: |                                | 1.9% - Time remaining: 2112s - Time elapsed: 40s
+			Current layer (#4): layer388
+				Appliying regression and examine statistics: |                                | 2.3% - Time remaining: 1779s - Time elapsed: 41s
+	Current company (#4): COMPANY_34_BRANCH_120
+		Amount of layers present in COMPANY_34_BRANCH_120: 1
+			Current layer (#1): layer395
+				Appliying regression and examine statistics: |                                | 2.6% - Time remaining: 2912s - Time elapsed: 78s
+	Current company (#5): COMPANY_34_BRANCH_124
+		Amount of layers present in COMPANY_34_BRANCH_124: 1
+			Current layer (#1): layer392
+				Appliying regression and examine statistics: |                                | 3.0% - Time remaining: 2578s - Time elapsed: 79s
+	Current company (#6): COMPANY_34_BRANCH_126
+		Amount of layers present in COMPANY_34_BRANCH_126: 1
+			Current layer (#1): layer402
+				Appliying regression and examine statistics: |-                               | 3.4% - Time remaining: 4502s - Time elapsed: 157s
+	Current company (#7): COMPANY_34_BRANCH_127
+		Amount of layers present in COMPANY_34_BRANCH_127: 1
+			Current layer (#1): layer406
+				Appliying regression and examine statistics: |-                               | 3.8% - Time remaining: 4353s - Time elapsed: 170s
+	Current company (#8): COMPANY_34_BRANCH_129
+		Amount of layers present in COMPANY_34_BRANCH_129: 1
+			Current layer (#1): layer405
+				Appliying regression and examine statistics: |-                               | 4.1% - Time remaining: 3970s - Time elapsed: 179s
+	Current company (#9): COMPANY_34_BRANCH_130
+		Amount of layers present in COMPANY_34_BRANCH_130: 1
+			Current layer (#1): layer407
+				Appliying regression and examine statistics: |-                               | 4.5% - Time remaining: 4324s - Time elapsed: 197s
+	Current company (#10): COMPANY_34_BRANCH_131
+		Amount of layers present in COMPANY_34_BRANCH_131: 1
+			Current layer (#1): layer409
+				Appliying regression and examine statistics: |-                               | 4.9% - Time remaining: 4040s - Time elapsed: 198s
+	Current company (#11): COMPANY_34_BRANCH_132
+		Amount of layers present in COMPANY_34_BRANCH_132: 1
+			Current layer (#1): layer410
+				Appliying regression and examine statistics: |-                               | 5.3% - Time remaining: 4031s - Time elapsed: 199s
+	Current company (#12): COMPANY_35_BRANCH_134
+		Amount of layers present in COMPANY_35_BRANCH_134: 9
+			Current layer (#1): layer415
+				Appliying regression and examine statistics: |-                               | 5.6% - Time remaining: 7329s - Time elapsed: 332s
+			Current layer (#2): layer418
+				Appliying regression and examine statistics: |-                               | 6.0% - Time remaining: 10677s - Time elapsed: 468s
+			Current layer (#3): layer419
+				Appliying regression and examine statistics: |--                              | 6.4% - Time remaining: 12965s - Time elapsed: 599s
+			Current layer (#4): layer416
+				Appliying regression and examine statistics: |--                              | 6.8% - Time remaining: 16258s - Time elapsed: 735s
+			Current layer (#5): layer417
+				Appliying regression and examine statistics: |--                              | 7.1% - Time remaining: 17346s - Time elapsed: 859s
+			Current layer (#6): layer414
+				Appliying regression and examine statistics: |--                              | 7.5% - Time remaining: 19986s - Time elapsed: 982s
+			Current layer (#7): layer420
+				Appliying regression and examine statistics: |--                              | 7.9% - Time remaining: 22730s - Time elapsed: 1107s
+			Current layer (#8): layer425
+				Appliying regression and examine statistics: |--                              | 8.3% - Time remaining: 22311s - Time elapsed: 1112s
+			Current layer (#9): layer421
+				Appliying regression and examine statistics: |--                              | 8.6% - Time remaining: 25206s - Time elapsed: 1235s
+	Current company (#13): COMPANY_36_BRANCH_136
+		Amount of layers present in COMPANY_36_BRANCH_136: 2
+			Current layer (#1): layer429
+				Appliying regression and examine statistics: |--                              | 9.0% - Time remaining: 25094s - Time elapsed: 1236s
+			Current layer (#2): layer428
+				Appliying regression and examine statistics: |---                             | 9.4% - Time remaining: 23263s - Time elapsed: 1297s
+	Current company (#14): COMPANY_37_BRANCH_140
+		Amount of layers present in COMPANY_37_BRANCH_140: 3
+			Current layer (#1): layer434
+***************************************************************************************************************************************************
+
+Amount of companies present in dataset: 20
+	Current company (#1/20): COMPANY_34_BRANCH_115
+		Amount of layers present in COMPANY_34_BRANCH_115: 1
+			Current layer (#1/1): layer398
+				Appliying regression and examine statistics: |                                | 0.4% - Time remaining: 7505s - Time elapsed: 28s
+	Current company (#2/20): COMPANY_34_BRANCH_116
+		Amount of layers present in COMPANY_34_BRANCH_116: 1
+			Current layer (#1/1): layer372
+				Appliying regression and examine statistics: |                                | 0.8% - Time remaining: 4293s - Time elapsed: 32s
+	Current company (#3/20): COMPANY_34_BRANCH_118
+		Amount of layers present in COMPANY_34_BRANCH_118: 4
+			Current layer (#1/4): layer386
+				Appliying regression and examine statistics: |                                | 1.1% - Time remaining: 3904s - Time elapsed: 44s
+			Current layer (#2/4): layer387
+				Appliying regression and examine statistics: |                                | 1.5% - Time remaining: 2934s - Time elapsed: 44s
+			Current layer (#3/4): layer380
+				Appliying regression and examine statistics: |                                | 1.9% - Time remaining: 2400s - Time elapsed: 45s
+			Current layer (#4/4): layer388
+				Appliying regression and examine statistics: |                                | 2.3% - Time remaining: 2018s - Time elapsed: 46s
+	Current company (#4/20): COMPANY_34_BRANCH_120
+		Amount of layers present in COMPANY_34_BRANCH_120: 1
+			Current layer (#1/1): layer395
+				Appliying regression and examine statistics: |                                | 2.6% - Time remaining: 3151s - Time elapsed: 85s
+	Current company (#5/20): COMPANY_34_BRANCH_124
+		Amount of layers present in COMPANY_34_BRANCH_124: 1
+			Current layer (#1/1): layer392
+				Appliying regression and examine statistics: |                                | 3.0% - Time remaining: 2790s - Time elapsed: 86s
+	Current company (#6/20): COMPANY_34_BRANCH_126
+		Amount of layers present in COMPANY_34_BRANCH_126: 1
+			Current layer (#1/1): layer402
+
+
+
+
+
+
+
+
