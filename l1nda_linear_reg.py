@@ -9,7 +9,6 @@ import statsmodels.api as sm
 import os
 import shutil
 import json
-import pickle
 
 
 # Compute the correlation for two numpy arrays
@@ -161,20 +160,23 @@ def create_linear_models(company_list, filter_2015):
     # faulty layers
     faulty_layers = list()
 
-    bar = Bar(('Appliying regression and examine statistics:'),
+    bar = Bar(('\t\t\t\tAppliying regression and examine statistics:'),
              max=len(os.listdir(json_dir)),
              fill='-',
-             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
-
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
+    # for indicative purposes where the iteration process is at
+    print('Amount of companies present in dataset: %s' % len(company_list))
+    current_company = 0
     # iterate through input JSON directory to apply learning algorithm
     for json_file in company_list:
+        current_company += 1
         # try/except for gathering the faulty layers
         try:
-            print('\n Current company: ', json_file)
             # split extension
-            json_file = os.path.splitext(json_file)[0]
+            json_file_ex_ext = os.path.splitext(json_file)[0]
             # storage of the results
-            info_dir = os.path.join(results_dir, json_file)
+            info_dir = os.path.join(results_dir, json_file_ex_ext)
+            print('\tCurrent company (#%s): %s' % (current_company, json_file_ex_ext))
             # creation of the results directory
             if not os.path.exists(info_dir):
                     os.mkdir(info_dir)
@@ -187,12 +189,19 @@ def create_linear_models(company_list, filter_2015):
                     # apply learning algorithm only to WORKED dataset
                     if schedule_type == 'WORKED':
                         # for an indication where the iteration process is
-                        print('Amount of layers present: %s' % str(len(schedule.items())))
+                        print('\t\tAmount of layers present in %s: %s' % (json_file_ex_ext, str(len(schedule.items()))))
                         # overall statistics per branch
                         branch_total_frame = pd.DataFrame(columns=total_frame_columns)
+                        # for indicative measures
+                        current_layer = 0
+                        # store current layer
+                        layer_string = str()
+                        # iterate through the data_frame
                         for layer, data_frame in schedule.items():
                             # for an indication where the iteration process is
-                            print(layer)
+                            current_layer += 1
+                            print('\t\t\tCurrent layer (#%s): %s' % (current_layer, layer))
+                            layer_string = layer
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
                             exclude = ['date', 'hours']
@@ -213,7 +222,6 @@ def create_linear_models(company_list, filter_2015):
                             linear_model = sm.OLS(y, X).fit()
 
                             # coeficients/ parametersoutputed by the linear regression model
-
                             coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
 
                             data_planned = pd.read_json(json_data['PLANNED'][layer])
@@ -230,13 +238,14 @@ def create_linear_models(company_list, filter_2015):
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
                             # append current branch statistics to file
                             branch_total_frame.append(info_current_layer)
+                            bar.next()
                 # write current branch statistics to file
                 branch_total_frame.to_csv(info_dir)
-                bar.next()
         except Exception as e:
-            print('Appearantly a faulty layer: %s' % e)
+            print(e)
+            print('\t\t\tApparantly a faulty layer: %s' % layer_string)
             # append faulty layer to all faulty layers
-            faulty_layer = json_file + '_' + layer
+            faulty_layer = json_file + '_' + layer_string
             faulty_layers.append(faulty_layer)
             bar.next()
             continue
