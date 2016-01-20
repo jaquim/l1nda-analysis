@@ -127,7 +127,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
 
 # write to faulty layers to file
 def write_faulty_layers(faulty_list):
-    with open('faulty_layers.txt', 'w') as faulty_file:
+    with open('./datadump/results/faulty_layers.txt', 'w') as faulty_file:
         for layer in faulty_list:
             faulty_file.write("%s\n" % str(layer))
 
