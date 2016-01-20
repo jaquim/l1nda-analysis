@@ -112,7 +112,10 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
-    info['model'] = coef_model
+    info['model'] = str(coef_model)
+
+    # wegschrijven per branch?
+    # make a list of done things to get it back from where it stopped (log)
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
@@ -121,96 +124,162 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
 
     info.to_csv(layer_name, sep=',', index=False)
 
-    return total_frame
+    return total_frame, info
 
 
-def create_linear_models():
+# write to faulty layers to file
+def write_faulty_layers(faulty_list):
+    with open('faulty_layers.txt', 'w') as faulty_file:
+        for layer in faulty_list:
+            faulty_file.write("%s\n" % str(layer))
+
+
+# company list for distributing the amount of companys
+def create_linear_models(company_list, filter_2015):
+
     # input directory for JSON data
     json_dir = './datadump/json/'
     # output directory for overall statistics
     results_dir = './datadump/results/'
     # pandas dataframe with total results
-    total_frame = pd.DataFrame(columns=['mean_missplanned_planner',
-                                        'mean_missplanned_prediction',
-                                        'std_planner',
-                                        'std_prediction',
-                                        'over_planned_planner',
-                                        'under_planned_planner',
-                                        'over_planned_pred',
-                                        'under_planned_pred',
-                                        'percentage',
-                                        'most_predicting_feature'])
+    total_frame_columns = ['mean_missplanned_planner',
+                           'mean_missplanned_prediction',
+                           'std_planner',
+                           'std_prediction',
+                           'over_planned_planner',
+                           'under_planned_planner',
+                           'over_planned_pred',
+                           'under_planned_pred',
+                           'percentage',
+                           'most_predicting_feature']
 
+    # overall statistics
+    total_frame = pd.DataFrame(columns=total_frame_columns)
     # creation  of output directory
     if os.path.exists(results_dir):
                 shutil.rmtree(results_dir)
     os.mkdir(results_dir)
+    # faulty layers
+    faulty_layers = list()
 
-    bar = Bar(('Appliying regression and examine statistics:'),
+    bar = Bar(('\t\t\t\tAppliying regression and examine statistics:'),
              max=len(os.listdir(json_dir)),
              fill='-',
-             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds')
-
+             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
+    # for indicative purposes where the iteration process is at
+    print('Amount of companies present in dataset: %s' % len(company_list))
+    current_company = 0
     # iterate through input JSON directory to apply learning algorithm
-    for json_file in os.listdir(json_dir):
-        print(json_file)
-        info_dir = os.path.join(results_dir, os.path.splitext(json_file)[0])
-
-        if not os.path.exists(info_dir):
-                os.mkdir(info_dir)
-
-        with open(os.path.join(json_dir, json_file)) as data:
-            json_data = json.load(data)
-
-            for schedule_type, schedule in json_data.items():
-                # apply learning algorithm only to WORKED dataset
-                if schedule_type == 'WORKED':
-                    # for an indication where the iteration process is
-                    print(len(schedule.items()))
-                    for layer, data_frame in schedule.items():
+    for json_file in company_list:
+        current_company += 1
+        # try/except for gathering the faulty layers
+        try:
+            # split extension
+            json_file_ex_ext = os.path.splitext(json_file)[0]
+            # storage of the results
+            info_dir = os.path.join(results_dir, json_file_ex_ext)
+            print('\tCurrent company (#%s): %s' % (current_company, json_file_ex_ext))
+            # creation of the results directory
+            if not os.path.exists(info_dir):
+                    os.mkdir(info_dir)
+            # opening current JSON file
+            with open(os.path.join(json_dir, json_file)) as data:
+                # converting current JSON file back into a dict
+                json_data = json.load(data)
+                # iterate through dict-like object again
+                for schedule_type, schedule in json_data.items():
+                    # apply learning algorithm only to WORKED dataset
+                    if schedule_type == 'WORKED':
                         # for an indication where the iteration process is
-                        print(layer)
-                        # transform data_frame from pandas to json, back to pandas frame
-                        json_data[schedule_type][layer] = pd.read_json(data_frame)
-                        exclude = ['date', 'hours']
-                        data_frame = pd.read_json(data_frame)
-                        # filter only on 2015 data
+                        print('\t\tAmount of layers present in %s: %s' % (json_file_ex_ext, str(len(schedule.items()))))
+                        # overall statistics per branch
+                        branch_total_frame = pd.DataFrame(columns=total_frame_columns)
+                        # for indicative measures
+                        current_layer = 0
+                        # store current layer
+                        layer_string = str()
+                        # iterate through the data_frame
+                        for layer, data_frame in schedule.items():
+                            # for an indication where the iteration process is
+                            current_layer += 1
+                            print('\t\t\tCurrent layer (#%s): %s' % (current_layer, layer))
+                            layer_string = layer
+                            # transform data_frame from pandas to json, back to pandas frame
+                            json_data[schedule_type][layer] = pd.read_json(data_frame)
+                            exclude = ['date', 'hours']
+                            data_frame = pd.read_json(data_frame)
+                            # filter only on 2015 data
+                            if filter_2015 is True:
+                                data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
+                            # check if there is
+                            if data_frame.empty:
+                                continue
+                            # create the dataset by excluding the date and hours
+                            X = data_frame.ix[:, data_frame.columns.difference(exclude)]
+                            # instantiate y vector
+                            y = data_frame['hours']
+                            # create/compute/fit a multivariate linear regression model
+                            # no iteration is used, but the statsmodels is
+                            # vector based multiplication-wise implemented
+                            linear_model = sm.OLS(y, X).fit()
 
-                        # data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
+                            # coeficients/ parametersoutputed by the linear regression model
+                            coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
 
-                        # check if there is
-                        if data_frame.empty:
-                            continue
-                        # create the dataset by excluding the date and hours
-                        X = data_frame.ix[:, data_frame.columns.difference(exclude)]
-                        # instantiate y vector
-                        y = data_frame['hours']
-                        # create/compute/fit a multivariate linear regression model
-                        # no iteration is used, but the statsmodels is
-                        # vector based multiplication-wise implemented
-                        linear_model = sm.OLS(y, X).fit()
+                            data_planned = pd.read_json(json_data['PLANNED'][layer])
 
-                        # coeficients/ parametersoutputed by the linear regression model
+                            layer_name = info_dir + '/' + layer + '/'
 
-                        coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+                            if not os.path.exists(layer_name):
+                                os.mkdir(layer_name)
 
-                        data_planned = pd.read_json(json_data['PLANNED'][layer])
-
-                        layer_name = info_dir + '/' + layer + '/'
-
-                        if not os.path.exists(layer_name):
-                            os.mkdir(layer_name)
-
-                        # compute plots
-                        prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
-                        # compute overall statistics
-                        total_frame = info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
-            print(total_frame.describe())
+                            # compute plots
+                            prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+                            # compute overall statistics
+                            total_frame, info_current_layer = \
+                                info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
+                            # append current branch statistics to file
+                            branch_total_frame.append(info_current_layer)
+                            bar.next()
+                # write current branch statistics to file
+                branch_total_frame.to_csv(info_dir)
+        except Exception as e:
+            print(e)
+            print('\t\t\tApparantly a faulty layer: %s' % layer_string)
+            # append faulty layer to all faulty layers
+            faulty_layer = json_file + '_' + layer_string
+            faulty_layers.append(faulty_layer)
             bar.next()
-
+            continue
+    # write faulty layers
+    write_faulty_layers(faulty_layers)
+    # output overall most predicting feauture (by occurence):
     overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
-    total_frame.describe().to_csv(results_dir + '_TOTAL_OVERVIEW', sep=',', index=False)
+    print('The overall most predicting feature is: %s' % overall_most_predicting)
+    # write overall statistics
+    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
+    # end progressbar
     bar.finish()
 
-    # print(total_frame.describe())
-create_linear_models()
+# distributing the computational load (fill in your own list):
+company_list = ['COMPANY_11_BRANCH_38.json',
+                'COMPANY_11_BRANCH_39.json',
+                'COMPANY_12_BRANCH_41.json',
+                'COMPANY_13_BRANCH_43.json',
+                'COMPANY_14_BRANCH_45.json',
+                'COMPANY_15_BRANCH_47.json',
+                'COMPANY_16_BRANCH_49.json',
+                'COMPANY_17_BRANCH_51.json',
+                'COMPANY_17_BRANCH_53.json',
+                'COMPANY_18_BRANCH_55.json',
+                'COMPANY_19_BRANCH_59.json',
+                'COMPANY_19_BRANCH_60.json',
+                'COMPANY_20_BRANCH_63.json',
+                'COMPANY_20_BRANCH_64.json',
+                'COMPANY_20_BRANCH_66.json',
+                'COMPANY_20_BRANCH_67.json',
+                'COMPANY_20_BRANCH_69.json',
+                'COMPANY_21_BRANCH_71.json',
+                'COMPANY_22_BRANCH_73.json']
+
+create_linear_models(company_list=company_list, filter_2015=False)
