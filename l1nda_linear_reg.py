@@ -245,7 +245,7 @@ def create_linear_models(company_list, filter_2015):
                 branch_total_frame.to_csv(info_dir)
         except Exception as e:
             print(e)
-            print('\t\t\tApparantly a faulty layer: %s' % layer_string)
+            print('\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
             # append faulty layer to all faulty layers
             faulty_layer = json_file + '_' + layer_string
             faulty_layers.append(faulty_layer)
