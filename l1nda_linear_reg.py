@@ -244,7 +244,7 @@ def create_linear_models(filter_2015):
             print(e)
             print('\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
             # append faulty layer to all faulty layers
-            faulty_layer = json_file + '_' + layer_string
+            faulty_layer = json_file_ex_ext + '_' + layer_string
             faulty_layers.append(faulty_layer)
             continue
     # write faulty layers
