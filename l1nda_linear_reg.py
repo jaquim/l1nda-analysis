@@ -112,7 +112,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
     info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
-    info['model'] = str(coef_model)
+    # info['model'] = str(coef_model)
 
     # wegschrijven per branch?
     # make a list of done things to get it back from where it stopped (log)
@@ -182,7 +182,6 @@ def create_linear_models(filter_2015):
             # creation of the results directory
             if not os.path.exists(info_dir):
                     os.mkdir(info_dir)
-            # opening current JSON file
             with open(os.path.join(json_dir, json_file)) as data:
                 # converting current JSON file back into a dict
                 json_data = json.load(data)
@@ -238,18 +237,18 @@ def create_linear_models(filter_2015):
                             # compute overall statistics
                             total_frame, info_current_layer = \
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
+                            print(total_frame, info_current_layer)
                             # append current branch statistics to file
-                            branch_total_frame.append(info_current_layer)
+                            # branch_total_frame.append(info_current_layer)
                             bar.next()
                 # write current branch statistics to file
-                branch_total_frame.to_csv(info_dir)
-        except Exception as e:
-            print(e)
-            print('\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
+                # print(branch_total_frame)
+                branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
+        except:
+            print('\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
             # append faulty layer to all faulty layers
             faulty_layer = json_file + '_' + layer_string
             faulty_layers.append(faulty_layer)
-            bar.next()
             continue
     # write faulty layers
     write_faulty_layers(faulty_layers)
@@ -257,7 +256,7 @@ def create_linear_models(filter_2015):
     overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
     print('The overall most predicting feature is: %s' % overall_most_predicting)
     # write overall statistics
-    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
+    # total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
     # end progressbar
     bar.finish()
 
