@@ -199,6 +199,8 @@ def create_linear_models(company_list, filter_2015):
                         layer_string = str()
                         # iterate through the data_frame
                         for layer, data_frame in schedule.items():
+                            # add theta_vector
+                            data_frame.insert(len(data_frame.columns), 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates=False)
                             # for an indication where the iteration process is
                             current_layer += 1
                             print('\t\t\tCurrent layer (#%s): %s' % (current_layer, layer))
