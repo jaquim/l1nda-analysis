@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+from __future__ import division
 from scipy.stats import pearsonr
 from progress.bar import Bar
 import numpy as np
@@ -150,7 +150,7 @@ def create_linear_models(company_list, filter_2015):
                            'under_planned_planner',
                            'over_planned_pred',
                            'under_planned_pred',
-                           'percentage',
+                           'performance_ratio',
                            'most_predicting_feature']
 
     # overall statistics
@@ -167,7 +167,8 @@ def create_linear_models(company_list, filter_2015):
              fill='-',
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
     # for indicative purposes where the iteration process is at
-    print('Amount of companies present in dataset: %s' % len(company_list))
+    amount_of_companies = len(company_list)
+    print('Amount of companies present in dataset: %s' % amount_of_companies)
     current_company = 0
     # iterate through input JSON directory to apply learning algorithm
     for json_file in company_list:
@@ -178,7 +179,7 @@ def create_linear_models(company_list, filter_2015):
             json_file_ex_ext = os.path.splitext(json_file)[0]
             # storage of the results
             info_dir = os.path.join(results_dir, json_file_ex_ext)
-            print('\tCurrent company (#%s): %s' % (current_company, json_file_ex_ext))
+            print('\tCurrent company (#%s/%s): %s' % (current_company, amount_of_companies, json_file_ex_ext))
             # creation of the results directory
             if not os.path.exists(info_dir):
                     os.mkdir(info_dir)
@@ -190,7 +191,8 @@ def create_linear_models(company_list, filter_2015):
                     # apply learning algorithm only to WORKED dataset
                     if schedule_type == 'WORKED':
                         # for an indication where the iteration process is
-                        print('\t\tAmount of layers present in %s: %s' % (json_file_ex_ext, str(len(schedule.items()))))
+                        amount_of_layers = len(schedule.items())
+                        print('\t\tAmount of layers present in %s: %s' % (json_file_ex_ext, amount_of_layers))
                         # overall statistics per branch
                         branch_total_frame = pd.DataFrame(columns=total_frame_columns)
                         # for indicative measures
@@ -201,7 +203,7 @@ def create_linear_models(company_list, filter_2015):
                         for layer, data_frame in schedule.items():
                             # for an indication where the iteration process is
                             current_layer += 1
-                            print('\t\t\tCurrent layer (#%s): %s' % (current_layer, layer))
+                            print('\t\t\tCurrent layer (#%s/%s): %s' % (current_layer, amount_of_layers, layer))
                             layer_string = layer
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
@@ -209,7 +211,7 @@ def create_linear_models(company_list, filter_2015):
                             data_frame = pd.read_json(data_frame)
                             # filter only on 2015 data
                             if filter_2015 is True:
-                                data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
+                                data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
                             # check if there is
                             if data_frame.empty:
                                 continue
@@ -237,12 +239,10 @@ def create_linear_models(company_list, filter_2015):
                             # compute overall statistics
                             total_frame, info_current_layer = \
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
-                            print(total_frame, info_current_layer)
                             # append current branch statistics to file
-                            # branch_total_frame.append(info_current_layer)
+                            branch_total_frame = branch_total_frame.append(info_current_layer)
                             bar.next()
                 # write current branch statistics to file
-                # print(branch_total_frame)
                 branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
         except Exception as e:
             print(e)
@@ -283,4 +283,4 @@ company_list = ['COMPANY_34_BRANCH_115.json',
                 'COMPANY_37_BRANCH_147.json',
                 'COMPANY_37_BRANCH_148.json']
 
-create_linear_models(company_list=company_list, filter_2015=True)
+create_linear_models(company_list=company_list, filter_2015=False)
