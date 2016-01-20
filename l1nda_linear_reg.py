@@ -255,7 +255,7 @@ def create_linear_models(filter_2015):
     overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
     print('The overall most predicting feature is: %s' % overall_most_predicting)
     # write overall statistics
-    # total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
+    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
     # end progressbar
     bar.finish()
 
