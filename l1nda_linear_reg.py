@@ -239,10 +239,10 @@ def create_linear_models(company_list, filter_2015):
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
                             print(total_frame, info_current_layer)
                             # append current branch statistics to file
-                            branch_total_frame.append(info_current_layer)
+                            # branch_total_frame.append(info_current_layer)
                             bar.next()
                 # write current branch statistics to file
-                print(branch_total_frame)
+                # print(branch_total_frame)
                 branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
         except:
             print('\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
@@ -256,7 +256,7 @@ def create_linear_models(company_list, filter_2015):
     overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
     print('The overall most predicting feature is: %s' % overall_most_predicting)
     # write overall statistics
-    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
+    # total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
     # end progressbar
     bar.finish()
 
