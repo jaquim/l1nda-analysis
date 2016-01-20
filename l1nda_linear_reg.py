@@ -79,8 +79,8 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     mean_pred = total_pred/counter
     mean_planner = total_planned/counter
 
-    total_pred = 0
-    total_planned = 0
+    total_pred_2 = 0
+    total_planned_2 = 0
     counter = 0
 
     # Calculate the standarddeviation
@@ -88,13 +88,13 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     for pred, worked, planned in zip(prediction_list, worked_list, planned_list):
         hours_wrong_pred = abs(pred-worked)
         hours_wrong_plan = abs(planned-worked)
-        total_pred = total_pred + abs(hours_wrong_pred - mean_pred)
-        total_planned = total_planned + abs(hours_wrong_plan - mean_pred)
+        total_pred_2 = total_pred_2 + abs(hours_wrong_pred - mean_pred)
+        total_planned_2 = total_planned_2 + abs(hours_wrong_plan - mean_pred)
 
         counter += 1
 
-    std_pred = total_pred/counter
-    std_planned = total_planned/counter
+    std_pred = total_pred_2/counter
+    std_planned = total_planned_2/counter
 
     performance_ratio = total_planned/total_pred
 
@@ -262,24 +262,25 @@ def create_linear_models(company_list, filter_2015):
     bar.finish()
 
 # distributing the computational load (fill in your own list):
-company_list = ['COMPANY_11_BRANCH_38.json',
-                'COMPANY_11_BRANCH_39.json',
-                'COMPANY_12_BRANCH_41.json',
-                'COMPANY_13_BRANCH_43.json',
-                'COMPANY_14_BRANCH_45.json',
-                'COMPANY_15_BRANCH_47.json',
-                'COMPANY_16_BRANCH_49.json',
-                'COMPANY_17_BRANCH_51.json',
-                'COMPANY_17_BRANCH_53.json',
-                'COMPANY_18_BRANCH_55.json',
-                'COMPANY_19_BRANCH_59.json',
-                'COMPANY_19_BRANCH_60.json',
-                'COMPANY_20_BRANCH_63.json',
-                'COMPANY_20_BRANCH_64.json',
-                'COMPANY_20_BRANCH_66.json',
-                'COMPANY_20_BRANCH_67.json',
-                'COMPANY_20_BRANCH_69.json',
-                'COMPANY_21_BRANCH_71.json',
-                'COMPANY_22_BRANCH_73.json']
+company_list = ['COMPANY_34_BRANCH_115.json',
+                'COMPANY_34_BRANCH_116.json',
+                'COMPANY_34_BRANCH_118.json',
+                'COMPANY_34_BRANCH_120.json',
+                'COMPANY_34_BRANCH_124.json',
+                'COMPANY_34_BRANCH_126.json',
+                'COMPANY_34_BRANCH_127.json',
+                'COMPANY_34_BRANCH_129.json',
+                'COMPANY_34_BRANCH_130.json',
+                'COMPANY_34_BRANCH_131.json',
+                'COMPANY_34_BRANCH_132.json',
+                'COMPANY_35_BRANCH_134.json',
+                'COMPANY_36_BRANCH_136.json',
+                'COMPANY_37_BRANCH_140.json',
+                'COMPANY_37_BRANCH_141.json',
+                'COMPANY_37_BRANCH_142.json',
+                'COMPANY_37_BRANCH_143.json',
+                'COMPANY_37_BRANCH_146.json',
+                'COMPANY_37_BRANCH_147.json',
+                'COMPANY_37_BRANCH_148.json']
 
-create_linear_models(company_list=company_list, filter_2015=False)
+create_linear_models(company_list=company_list, filter_2015=True)
