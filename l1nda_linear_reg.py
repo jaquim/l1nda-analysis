@@ -12,8 +12,6 @@ import os
 import shutil
 import json
 
-lijstje = ['COMPANY_34_BRANCH_115.json', 'COMPANY_34_BRANCH_116.json', 'COMPANY_34_BRANCH_118.json', 'COMPANY_34_BRANCH_120.json', 'COMPANY_34_BRANCH_124.json', 'COMPANY_34_BRANCH_126.json', 'COMPANY_34_BRANCH_127.json', 'COMPANY_34_BRANCH_129.json', 'COMPANY_34_BRANCH_130.json', 'COMPANY_34_BRANCH_131.json', 'COMPANY_34_BRANCH_132.json', 'COMPANY_35_BRANCH_134.json', 'COMPANY_36_BRANCH_136.json', 'COMPANY_37_BRANCH_140.json', 'COMPANY_37_BRANCH_141.json', 'COMPANY_37_BRANCH_142.json', 'COMPANY_37_BRANCH_143.json', 'COMPANY_37_BRANCH_146.json', 'COMPANY_37_BRANCH_147.json', 'COMPANY_37_BRANCH_148.json']
-
 
 # Compute the correlation for two numpy arrays
 def compute_correlation(X, Y):
