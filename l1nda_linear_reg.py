@@ -135,7 +135,7 @@ def write_faulty_layers(faulty_list):
 
 
 # company list for distributing the amount of companys
-def create_linear_models(company_list, filter_2015):
+def create_linear_models(filter_2015):
 
     # input directory for JSON data
     json_dir = './datadump/json/'
@@ -171,7 +171,7 @@ def create_linear_models(company_list, filter_2015):
     print('Amount of companies present in dataset: %s' % amount_of_companies)
     current_company = 0
     # iterate through input JSON directory to apply learning algorithm
-    for json_file in company_list:
+    for json_file in os.listdir(json_dir):
         current_company += 1
         # try/except for gathering the faulty layers
         try:
@@ -261,26 +261,4 @@ def create_linear_models(company_list, filter_2015):
     # end progressbar
     bar.finish()
 
-# distributing the computational load (fill in your own list):
-company_list = ['COMPANY_34_BRANCH_115.json',
-                'COMPANY_34_BRANCH_116.json',
-                'COMPANY_34_BRANCH_118.json',
-                'COMPANY_34_BRANCH_120.json',
-                'COMPANY_34_BRANCH_124.json',
-                'COMPANY_34_BRANCH_126.json',
-                'COMPANY_34_BRANCH_127.json',
-                'COMPANY_34_BRANCH_129.json',
-                'COMPANY_34_BRANCH_130.json',
-                'COMPANY_34_BRANCH_131.json',
-                'COMPANY_34_BRANCH_132.json',
-                'COMPANY_35_BRANCH_134.json',
-                'COMPANY_36_BRANCH_136.json',
-                'COMPANY_37_BRANCH_140.json',
-                'COMPANY_37_BRANCH_141.json',
-                'COMPANY_37_BRANCH_142.json',
-                'COMPANY_37_BRANCH_143.json',
-                'COMPANY_37_BRANCH_146.json',
-                'COMPANY_37_BRANCH_147.json',
-                'COMPANY_37_BRANCH_148.json']
-
-create_linear_models(company_list=company_list, filter_2015=False)
+create_linear_models(filter_2015=False)
