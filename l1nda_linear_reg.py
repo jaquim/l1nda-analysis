@@ -136,9 +136,7 @@ def write_faulty_layers(faulty_list):
             faulty_file.write("%s\n" % str(layer))
 
 
-# company list for distributing the amount of companys
 def create_linear_models(filter_2015):
-
     # input directory for JSON data
     json_dir = './datadump/json/'
     # output directory for overall statistics
@@ -169,7 +167,7 @@ def create_linear_models(filter_2015):
              fill='-',
              suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
     # for indicative purposes where the iteration process is at
-    amount_of_companies = len(company_list)
+    amount_of_companies = len(os.listdir(json_dir))
     print('Amount of companies present in dataset: %s' % amount_of_companies)
     current_company = 0
     # iterate through input JSON directory to apply learning algorithm
