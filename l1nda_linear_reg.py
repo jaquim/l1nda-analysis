@@ -135,7 +135,7 @@ def write_faulty_layers(faulty_list):
 
 
 # company list for distributing the amount of companys
-def create_linear_models(company_list, filter_2015):
+def create_linear_models(filter_2015):
 
     # input directory for JSON data
     json_dir = './datadump/json/'
@@ -170,7 +170,7 @@ def create_linear_models(company_list, filter_2015):
     print('Amount of companies present in dataset: %s' % len(company_list))
     current_company = 0
     # iterate through input JSON directory to apply learning algorithm
-    for json_file in company_list:
+    for json_file in os.listdir(json_dir):
         current_company += 1
         # try/except for gathering the faulty layers
         try:
@@ -283,4 +283,4 @@ company_list = ['COMPANY_34_BRANCH_115.json',
                 'COMPANY_37_BRANCH_147.json',
                 'COMPANY_37_BRANCH_148.json']
 
-create_linear_models(company_list=company_list, filter_2015=True)
+create_linear_models(filter_2015=True)
