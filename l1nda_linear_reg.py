@@ -109,7 +109,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     info['under_planned_pred'] = under_planned_pred
     # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
-    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])
     info['model'] = str(coef_model)
 
     # Add the info to a dataframe of the info of all the layers, for future use
@@ -129,7 +129,7 @@ def write_faulty_layers(faulty_list):
             faulty_file.write("%s\n" % str(layer))
 
 
-def create_linear_models(filter_2015):
+def create_linear_models(filter_on_years):
     # input directory for JSON data
     json_dir = './datadump/json/'
     # output directory for overall statistics
@@ -202,15 +202,24 @@ def create_linear_models(filter_2015):
                             layer_string = layer
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
-                            exclude = ['date', 'hours']
                             data_frame = pd.read_json(data_frame)
-                            # filter only on 2015 data
-                            if filter_2015 is True:
-                                data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
+                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates = False)
+
+                            if filter_on_years is True:
+                                # train on 2014 data and predict on 2015 data
+                                data_frame_2014 = data_frame[(data_frame['date'] > '2013-12-31') & (data_frame['date'] < '2015-01-01')]
+                                data_frame_2015 = data_frame[(data_frame['date'] > '2014-12-31') & (data_frame['date'] < '2016-01-01')]
+                                rows_2014, columns_2014 = data_frame_2014.shape
+                                rows_2015, columns_2015 = data_frame_2015.shape
+                                if((rows_2014 <= 250) or (rows_2015 <= 250)):
+                                    print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
+                                    continue
+
                             # check if there is
                             if data_frame.empty:
                                 continue
                             # create the dataset by excluding the date and hours
+                            exclude = ['date', 'hours']
                             X = data_frame.ix[:, data_frame.columns.difference(exclude)]
                             # instantiate y vector
                             y = data_frame['hours']
@@ -220,7 +229,7 @@ def create_linear_models(filter_2015):
                             linear_model = sm.OLS(y, X).fit()
 
                             # coeficients/ parametersoutputed by the linear regression model
-                            coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+                            coef_list = dict(zip(linear_model.params.index.tolist(), linear_model.params.tolist()))
 
                             data_planned = pd.read_json(json_data['PLANNED'][layer])
 
@@ -229,8 +238,12 @@ def create_linear_models(filter_2015):
                             if not os.path.exists(layer_name):
                                 os.mkdir(layer_name)
 
-                            # compute plots
-                            prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+                            if filter_on_years is True:
+                                # compute plots
+                                prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame_2015, data_planned, coef_list, layer_name + layer)
+                            else:
+                                prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
+
                             # compute overall statistics
                             total_frame, info_current_layer = \
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
@@ -242,7 +255,7 @@ def create_linear_models(filter_2015):
                 branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
         except Exception as e:
             print(e)
-            print('\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
+            print('\t\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
             # append faulty layer to all faulty layers
             faulty_layer = json_file_ex_ext + '_' + layer_string
             faulty_layers.append(faulty_layer)
@@ -257,4 +270,4 @@ def create_linear_models(filter_2015):
     # end progressbar
     bar.finish()
 
-create_linear_models(filter_2015=False)
+create_linear_models(filter_on_years=True)
