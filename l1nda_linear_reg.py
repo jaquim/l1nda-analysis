@@ -205,11 +205,11 @@ def create_linear_models(filter_on_years):
 
                             if filter_on_years is True:
                                 # train on 2014 data and predict on 2015 data
-                                data_frame_2014 = data_frame[(data_frame['date'] > '2013-12-31') & (data_frame['date'] < '2015-01-01')]
+                                data_frame_2014 = data_frame[(data_frame['date'] > '2012-12-31') & (data_frame['date'] < '2015-01-01')]
                                 data_frame_2015 = data_frame[(data_frame['date'] > '2014-12-31') & (data_frame['date'] < '2016-01-01')]
                                 rows_2014, columns_2014 = data_frame_2014.shape
                                 rows_2015, columns_2015 = data_frame_2015.shape
-                                if((rows_2014 <= 250) or (rows_2015 <= 250)):
+                                if((rows_2014 <= 500) or (rows_2015 <= 250)):
                                     print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
                                     continue
 
