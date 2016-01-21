@@ -201,6 +201,7 @@ def create_linear_models(filter_on_years):
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
                             data_frame = pd.read_json(data_frame)
+
                             if filter_on_years is True:
                                 # train on 2014 data and predict on 2015 data
                                 data_frame_2014 = data_frame[(data_frame['date'] > '2013-12-31') & (data_frame['date'] < '2015-01-01')]
@@ -210,6 +211,7 @@ def create_linear_models(filter_on_years):
                                 if((rows_2014 <= 250) or (rows_2015 <= 250)):
                                     print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
                                     continue
+
                             # check if there is
                             if data_frame.empty:
                                 continue
