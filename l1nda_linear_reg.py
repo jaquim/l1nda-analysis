@@ -204,7 +204,7 @@ def create_linear_models(filter_2015):
                             data_frame = pd.read_json(data_frame)
                             # filter only on 2015 data
                             if filter_2015 is True:
-                                data_frame = data_frame[(data_frame['date'] > '2014-12-31')]
+                                data_frame = data_frame[(data_frame['date'] > '2013-12-31')]
                             # check if there is
                             if data_frame.empty:
                                 continue
@@ -254,4 +254,4 @@ def create_linear_models(filter_2015):
     # end progressbar
     bar.finish()
 
-create_linear_models(filter_2015=False)
+create_linear_models(filter_2015=True)
