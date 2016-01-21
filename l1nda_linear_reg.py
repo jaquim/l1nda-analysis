@@ -122,6 +122,18 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     return total_frame, info
 
 
+# check if directory is empty, if so delete, otherwise
+# examine layers and write mean statistics
+def check_directory(info_dir, branch_total_frame, json_file_ex_ext):
+    directories_present = len(os.listdir(info_dir))
+    if directories_present == 0:
+        print('\t\tDeleting directory for %s (no layers present that satisfy requirements).' % json_file_ex_ext)
+        shutil.rmtree(info_dir)
+    else:
+        # write current branch statistics to file
+        branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
+
+
 # write to faulty layers to file
 def write_faulty_layers(faulty_list):
     with open('./datadump/results/faulty_layers.txt', 'w') as faulty_file:
@@ -211,7 +223,6 @@ def create_linear_models(filter_on_years):
                                 if((rows_2014 <= 250) or (rows_2015 <= 250)):
                                     print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
                                     continue
-
                             # check if there is
                             if data_frame.empty:
                                 continue
@@ -247,8 +258,9 @@ def create_linear_models(filter_on_years):
                             # append current branch statistics to file
                             branch_total_frame = branch_total_frame.append(info_current_layer)
                             bar.next()
-                # write current branch statistics to file
-                branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
+                # check if directory is empty, if so delete,
+                # otherwise, examine layers and write mean statistics
+                check_directory(info_dir, branch_total_frame, json_file_ex_ext)
         except Exception as e:
             print(e)
             print('\t\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
