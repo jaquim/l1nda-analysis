@@ -206,8 +206,6 @@ def create_linear_models(filter_on_years):
                         layer_string = str()
                         # iterate through the data_frame
                         for layer, data_frame in schedule.items():
-                            # insert theta_vector
-                            data_frame.insert(0, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates=False)
                             # for an indication where the iteration process is
                             current_layer += 1
                             print('\t\t\tCurrent layer (#%s/%s): %s' % (current_layer, amount_of_layers, layer))
@@ -215,8 +213,8 @@ def create_linear_models(filter_on_years):
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
                             data_frame = pd.read_json(data_frame)
-                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates = False)
-
+                            # insert theta_vector
+                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates=False)
                             if filter_on_years is True:
                                 # train on 2014 data and predict on 2015 data
                                 data_frame_2014 = data_frame[(data_frame['date'] > '2013-12-31') & (data_frame['date'] < '2015-01-01')]
