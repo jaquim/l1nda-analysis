@@ -206,6 +206,8 @@ def create_linear_models(filter_on_years):
                         layer_string = str()
                         # iterate through the data_frame
                         for layer, data_frame in schedule.items():
+                            # insert theta_vector
+                            data_frame.insert(0, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates=False)
                             # for an indication where the iteration process is
                             current_layer += 1
                             print('\t\t\tCurrent layer (#%s/%s): %s' % (current_layer, amount_of_layers, layer))
@@ -255,6 +257,7 @@ def create_linear_models(filter_on_years):
                             # compute overall statistics
                             total_frame, info_current_layer = \
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
+
                             # append current branch statistics to file
                             branch_total_frame = branch_total_frame.append(info_current_layer)
                             bar.next()
