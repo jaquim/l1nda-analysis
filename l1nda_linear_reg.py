@@ -227,7 +227,7 @@ def create_linear_models(filter_on_years):
                             linear_model = sm.OLS(y, X).fit()
 
                             # coeficients/ parametersoutputed by the linear regression model
-                            coef_list = zip(linear_model.params.index.tolist(), linear_model.params.tolist())
+                            coef_list = dict(zip(linear_model.params.index.tolist(), linear_model.params.tolist()))
 
                             data_planned = pd.read_json(json_data['PLANNED'][layer])
 
