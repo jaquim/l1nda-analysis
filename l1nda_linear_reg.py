@@ -109,7 +109,7 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     info['under_planned_pred'] = under_planned_pred
     # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
-    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])[0]
+    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])
     info['model'] = str(coef_model)
 
     # Add the info to a dataframe of the info of all the layers, for future use
