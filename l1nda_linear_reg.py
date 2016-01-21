@@ -224,14 +224,14 @@ def create_linear_models(filter_on_years):
                                 if((rows_2014 <= 250) or (rows_2015 <= 250)):
                                     print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
                                     continue
-                            # check if there is
+                            # check if there is a frame to be computed upon
                             if data_frame.empty:
                                 continue
                             # create the dataset by excluding the date and hours
                             exclude = ['date', 'hours']
-                            X = data_frame.ix[:, data_frame.columns.difference(exclude)]
+                            X = data_frame_2014.ix[:, data_frame.columns.difference(exclude)]
                             # instantiate y vector
-                            y = data_frame['hours']
+                            y = data_frame_2014['hours']
                             # create/compute/fit a multivariate linear regression model
                             # no iteration is used, but the statsmodels is
                             # vector based multiplication-wise implemented
