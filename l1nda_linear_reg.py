@@ -201,6 +201,7 @@ def create_linear_models(filter_on_years):
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
                             data_frame = pd.read_json(data_frame)
+                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates = False)
 
                             if filter_on_years is True:
                                 # train on 2014 data and predict on 2015 data
