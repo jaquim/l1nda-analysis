@@ -122,6 +122,18 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     return total_frame, info
 
 
+# check if directory is empty, if so delete, otherwise
+# examine layers and write mean statistics
+def check_directory(info_dir, branch_total_frame, json_file_ex_ext):
+    directories_present = len(os.listdir(info_dir))
+    if directories_present == 0:
+        print('\t\tDeleting directory for %s (no layers present that satisfy requirements).' % json_file_ex_ext)
+        shutil.rmtree(info_dir)
+    else:
+        # write current branch statistics to file
+        branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
+
+
 # write to faulty layers to file
 def write_faulty_layers(faulty_list):
     with open('./datadump/results/faulty_layers.txt', 'w') as faulty_file:
@@ -201,8 +213,8 @@ def create_linear_models(filter_on_years):
                             # transform data_frame from pandas to json, back to pandas frame
                             json_data[schedule_type][layer] = pd.read_json(data_frame)
                             data_frame = pd.read_json(data_frame)
-                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates = False)
-
+                            # insert theta_vector
+                            data_frame.insert(1, 'theta_vector', [1 for x in range(len(data_frame))], allow_duplicates=False)
                             if filter_on_years is True:
                                 # train on 2014 data and predict on 2015 data
                                 data_frame_2014 = data_frame[(data_frame['date'] > '2012-12-31') & (data_frame['date'] < '2015-01-01')]
@@ -212,15 +224,14 @@ def create_linear_models(filter_on_years):
                                 if((rows_2014 <= 500) or (rows_2015 <= 250)):
                                     print('\t\t\t\t%s does not meet the requirements: (2014:%s, 2015:%s)' % (layer, rows_2014, rows_2015))
                                     continue
-
-                            # check if there is
+                            # check if there is a frame to be computed upon
                             if data_frame.empty:
                                 continue
                             # create the dataset by excluding the date and hours
                             exclude = ['date', 'hours']
-                            X = data_frame.ix[:, data_frame.columns.difference(exclude)]
+                            X = data_frame_2014.ix[:, data_frame.columns.difference(exclude)]
                             # instantiate y vector
-                            y = data_frame['hours']
+                            y = data_frame_2014['hours']
                             # create/compute/fit a multivariate linear regression model
                             # no iteration is used, but the statsmodels is
                             # vector based multiplication-wise implemented
@@ -245,11 +256,13 @@ def create_linear_models(filter_on_years):
                             # compute overall statistics
                             total_frame, info_current_layer = \
                                 info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
+
                             # append current branch statistics to file
                             branch_total_frame = branch_total_frame.append(info_current_layer)
                             bar.next()
-                # write current branch statistics to file
-                branch_total_frame.describe().to_csv(info_dir + '/branch_statistics.csv', sep=',', index=False)
+                # check if directory is empty, if so delete,
+                # otherwise, examine layers and write mean statistics
+                check_directory(info_dir, branch_total_frame, json_file_ex_ext)
         except Exception as e:
             print(e)
             print('\t\t\t\t\t\tApparantly a faulty layer (skipping it): %s' % layer_string)
