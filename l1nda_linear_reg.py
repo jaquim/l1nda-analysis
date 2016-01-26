@@ -9,6 +9,7 @@ import statsmodels.api as sm
 import os
 import shutil
 import json
+from sklearn import preprocessing
 
 
 # Compute the correlation for two numpy arrays
@@ -42,7 +43,7 @@ def compute_layer_correlation(data_dict, features, company_affiliate_name):
 
 
 # Compute some info on the perfomance of the planner and our model
-def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef_model, total_frame):
+def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef_model, total_frame, max_corr):
 
     counter = 0
 
@@ -107,17 +108,12 @@ def info(prediction_list, worked_list, planned_list, layer_name, coef_list, coef
     info['under_planned_planner'] = under_planned_planner
     info['over_planned_pred'] = over_planned_pred
     info['under_planned_pred'] = under_planned_pred
-    # info['coef_list'] = coef_list
     info['performance_ratio'] = performance_ratio
-    info['most_predicting_feature'] = max(coef_list, key=lambda x: x[1])
     info['model'] = str(coef_model)
+    info['most_predicting_feature'] = max_corr
 
     # Add the info to a dataframe of the info of all the layers, for future use
     total_frame = total_frame.append(info)
-
-    layer_name = layer_name + '_overview.csv'
-
-    info.to_csv(layer_name, sep=',', index=False)
 
     return total_frame, info
 
@@ -166,11 +162,15 @@ def create_linear_models(filter_on_years):
     os.mkdir(results_dir)
     # faulty layers
     faulty_layers = list()
+    # Performance counters
+    more_than_100 = 0
+    between_80_100 = 0
+    less_than_80 = 0
 
     bar = Bar(('\t\t\t\tAppliying regression and examine statistics:'),
-             max=len(os.listdir(json_dir)),
-             fill='-',
-             suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
+            max=len(os.listdir(json_dir)),
+            fill='-',
+            suffix='%(percent).1f%% - Time remaining: %(eta)ds - Time elapsed: %(elapsed)ds\n')
     # for indicative purposes where the iteration process is at
     amount_of_companies = len(os.listdir(json_dir))
     print('Amount of companies present in dataset: %s' % amount_of_companies)
@@ -227,6 +227,7 @@ def create_linear_models(filter_on_years):
                             # check if there is a frame to be computed upon
                             if data_frame.empty:
                                 continue
+
                             # create the dataset by excluding the date and hours
                             exclude = ['date', 'hours']
                             X = data_frame_2014.ix[:, data_frame.columns.difference(exclude)]
@@ -253,9 +254,30 @@ def create_linear_models(filter_on_years):
                             else:
                                 prediction_list, worked_list, planned_list, _, coef_list, coef_model = prediction.predict(data_frame, data_planned, coef_list, layer_name + layer)
 
+                            # Calculate feature with highest correlation
+                            corr_list = list()
+                            y = y.transpose()
+                            for column_name, column in X.transpose().iterrows():
+                                corr = abs(column.corr(y))
+                                corr_list.append((column_name, corr))
+
+                            max_corr = max(corr_list ,key=lambda item:item[1])[0]
+
                             # compute overall statistics
                             total_frame, info_current_layer = \
-                                info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame)
+                                info(prediction_list, worked_list, planned_list, layer_name + layer, coef_list, coef_model, total_frame, max_corr)
+
+                            # add to performance counter
+                            if info_current_layer['performance_ratio'].iloc[0] > 1:
+                                more_than_100 += 1
+                            elif info_current_layer['performance_ratio'].iloc[0] > 0.8:
+                                between_80_100 += 1
+                            else:
+                                less_than_80 += 1
+
+                            layer_name = layer_name + layer + '_overview.csv'
+
+                            info_current_layer.to_csv(layer_name, sep=',', index=False)
 
                             # append current branch statistics to file
                             branch_total_frame = branch_total_frame.append(info_current_layer)
@@ -275,8 +297,13 @@ def create_linear_models(filter_on_years):
     # output overall most predicting feauture (by occurence):
     overall_most_predicting = total_frame['most_predicting_feature'].value_counts().index[0]
     print('The overall most predicting feature is: %s' % overall_most_predicting)
+    # Performance ratio's
+    total_performance = more_than_100 + between_80_100 + less_than_80
+    print('Companies higher than 1: ' + str(more_than_100/total_performance * 100) + '%')
+    print('Companies between 0.8 and 1: ' + str(between_80_100/total_performance * 100) + '%')
+    print('Companies lower than 0.8: ' + str(less_than_80/total_performance * 100) + '%')
     # write overall statistics
-    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=False)
+    total_frame.describe().to_csv(results_dir + 'l1nda_TOTAL_OVERVIEW', sep=',', index=True)
     # end progressbar
     bar.finish()
 
